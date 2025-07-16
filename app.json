@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "synkit",
+    "slug": "synkit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "io.synkit",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/mend-logo-app.png",
+          "resizeMode": "contain",
+          "imageWidth": 200,
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "expo-font",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Mend uses HealthKit to track your health data.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": true
+        }
+      ],
+      "expo-video",
+      [
+        "expo-notifications",
+        {
+          "enableBackgroundRemoteNotifications": true
+        }
+      ],
+      "expo-background-task",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a704bdd9-cf18-4f5c-b2c9-3b2b4da8287b"
+      }
+    }
+  }
+}

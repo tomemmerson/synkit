@@ -1,23 +1,27 @@
-import { Stack } from "expo-router";
+import { Stack, Tabs } from "expo-router";
 
 export default function StackLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="onboardingGoals"
+        name="welcome"
         options={{
           headerShown: false,
-          gestureEnabled: false,
           headerTransparent: true,
-          headerBlurEffect: "light",
         }}
       />
       <Stack.Screen
-        name="onboardingMendbot"
+        name="journey"
         options={{
           headerShown: false,
-          gestureEnabled: false,
-          headerBlurEffect: "light",
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="workout"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
         }}
       />
     </Stack>

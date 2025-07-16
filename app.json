@@ -20,21 +20,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/mend-logo-app.png",
+          "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
           "imageWidth": 200,
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#F8F8F7"
         }
       ],
       "expo-font",
-      [
-        "@kingstinct/react-native-healthkit",
-        {
-          "NSHealthShareUsageDescription": "Mend uses HealthKit to track your health data.",
-          "NSHealthUpdateUsageDescription": false,
-          "background": true
-        }
-      ],
       "expo-video",
       [
         "expo-notifications",

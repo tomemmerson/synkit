@@ -24,6 +24,13 @@ export default function StackLayout() {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="name"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
+        }}
+      />
     </Stack>
   );
 }

@@ -12,7 +12,7 @@ export default function Journey() {
 
   const handleNext = () => {
     // Navigation logic will go here
-    // router.push("/onboarding/onboardingMendbot");
+    router.push("/onboarding/name");
   };
 
   return (
@@ -37,9 +37,10 @@ export default function Journey() {
               />
             </View>
             <View style={styles.textSection}>
-              <Text style={styles.welcomeTitle}>Log your journey</Text>
+              <Text style={styles.welcomeTitle}>Pick a workout each week</Text>
               <Text style={styles.description}>
-                Log your period, mood, nutrition and workouts.
+                We’ll suggest workouts based on your period. Pick one, or browse
+                the others available.
               </Text>
             </View>
           </View>

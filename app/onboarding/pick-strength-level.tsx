@@ -7,8 +7,8 @@ import Button from "@/components/Button";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function PickWorkoutScreen() {
-  const [selectedWorkout, setSelectedWorkout] = useState("strength");
+export default function PickStrengthLevelScreen() {
+  const [selectedLevel, setSelectedLevel] = useState("intermediate");
 
   const handleNext = () => {
     // Navigation logic will go here
@@ -30,64 +30,125 @@ export default function PickWorkoutScreen() {
 
           <View style={styles.topSection}>
             <View style={styles.textSection}>
-              <Text style={styles.welcomeTitle}>
-                Which workout plan would you like to join?
-              </Text>
+              <Text style={styles.welcomeTitle}>What level are you?</Text>
               <Text style={styles.description}>
-                We'll suggest workouts based on your period. Pick one, or browse
-                the others available.
+                We'll suggest workouts based on your training and what you're
+                comfortable with.
               </Text>
             </View>
 
-            <View style={styles.workoutOptionsSection}>
+            <View style={styles.levelOptionsSection}>
               <TouchableOpacity
                 style={[
-                  styles.workoutCard,
-                  selectedWorkout === "running" && styles.workoutCardSelected,
+                  styles.levelCard,
+                  selectedLevel === "beginner" && styles.levelCardSelected,
                 ]}
-                onPress={() => setSelectedWorkout("running")}
+                onPress={() => setSelectedLevel("beginner")}
               >
-                <View style={styles.workoutImageContainer}>
+                <View style={styles.levelImageContainer}>
                   <Image
-                    source={require("../../assets/images/running-workout.png")}
-                    style={styles.workoutImage}
+                    source={require("../../assets/images/strength/strength-small.png")}
+                    style={styles.levelImage}
                     resizeMode="contain"
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.workoutTitle,
-                    selectedWorkout === "running" &&
-                      styles.workoutTitleSelected,
-                  ]}
-                >
-                  Running
-                </Text>
+                <View style={styles.levelTextContainer}>
+                  <Text
+                    style={[
+                      styles.levelTitle,
+                      selectedLevel === "beginner" && styles.levelTitleSelected,
+                    ]}
+                  >
+                    Strength
+                  </Text>
+                  <Text
+                    style={[
+                      styles.levelSubtitle,
+                      selectedLevel === "beginner" &&
+                        styles.levelSubtitleSelected,
+                    ]}
+                  >
+                    Beginner
+                  </Text>
+                  <Text style={styles.levelDescription}>Never run before</Text>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  styles.workoutCard,
-                  selectedWorkout === "strength" && styles.workoutCardSelected,
+                  styles.levelCard,
+                  selectedLevel === "intermediate" && styles.levelCardSelected,
                 ]}
-                onPress={() => setSelectedWorkout("strength")}
+                onPress={() => setSelectedLevel("intermediate")}
               >
-                <View style={styles.workoutImageContainer}>
+                <View style={styles.levelImageContainer}>
                   <Image
-                    source={require("../../assets/images/strength-workout.png")}
-                    style={styles.workoutImage}
+                    source={require("../../assets/images/strength/strength-medium.png")}
+                    style={styles.levelImage}
                     resizeMode="contain"
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.workoutTitle,
-                    selectedWorkout === "strength" &&
-                      styles.workoutTitleSelected,
-                  ]}
-                >
-                  Strength
-                </Text>
+                <View style={styles.levelTextContainer}>
+                  <Text
+                    style={[
+                      styles.levelTitle,
+                      selectedLevel === "intermediate" &&
+                        styles.levelTitleSelected,
+                    ]}
+                  >
+                    Strength
+                  </Text>
+                  <Text
+                    style={[
+                      styles.levelSubtitle,
+                      selectedLevel === "intermediate" &&
+                        styles.levelSubtitleSelected,
+                    ]}
+                  >
+                    Intermediate
+                  </Text>
+                  <Text style={styles.levelDescription}>
+                    Could easily run a 3k
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.levelCard,
+                  selectedLevel === "advanced" && styles.levelCardSelected,
+                ]}
+                onPress={() => setSelectedLevel("advanced")}
+              >
+                <View style={styles.levelImageContainer}>
+                  <Image
+                    source={require("../../assets/images/strength/strength-large.png")}
+                    style={styles.levelImage}
+                    resizeMode="contain"
+                  />
+                </View>
+                <View style={styles.levelTextContainer}>
+                  <Text
+                    style={[
+                      styles.levelTitle,
+                      selectedLevel === "advanced" && styles.levelTitleSelected,
+                    ]}
+                  >
+                    Strength
+                  </Text>
+                  <Text
+                    style={[
+                      styles.levelSubtitle,
+                      selectedLevel === "advanced" &&
+                        styles.levelSubtitleSelected,
+                    ]}
+                  >
+                    Advanced
+                  </Text>
+                  <Text style={styles.levelDescription}>
+                    Could easily run 10k
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -148,38 +209,53 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     paddingHorizontal: 10,
   },
-  workoutOptionsSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  levelOptionsSection: {
     paddingHorizontal: 20,
     gap: 16,
   },
-  workoutCard: {
-    flex: 1,
+  levelCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 20,
+    flexDirection: "row",
     alignItems: "center",
     borderWidth: 2,
     borderColor: "transparent",
   },
-  workoutCardSelected: {
+  levelCardSelected: {
     borderColor: "#6B46C1",
   },
-  workoutImageContainer: {
-    marginBottom: 16,
+  levelImageContainer: {
+    marginRight: 20,
   },
-  workoutImage: {
-    width: 80,
-    height: 100,
+  levelImage: {
+    width: 60,
+    height: 60,
   },
-  workoutTitle: {
+  levelTextContainer: {
+    flex: 1,
+  },
+  levelTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: "#2B2E46",
+    marginBottom: 2,
   },
-  workoutTitleSelected: {
+  levelTitleSelected: {
     color: "#6B46C1",
+  },
+  levelSubtitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#2B2E46",
+    marginBottom: 4,
+  },
+  levelSubtitleSelected: {
+    color: "#6B46C1",
+  },
+  levelDescription: {
+    fontSize: 14,
+    color: "#9294AC",
   },
   bottomSection: {
     paddingHorizontal: 16,

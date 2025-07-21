@@ -12,7 +12,7 @@ export default function PickWorkoutScreen() {
 
   const handleNext = () => {
     // Navigation logic will go here
-    // router.push("/onboarding/next-screen");
+    router.push("/onboarding/pick-strength-level");
   };
 
   return (

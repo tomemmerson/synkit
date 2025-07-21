@@ -38,6 +38,13 @@ export default function StackLayout() {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="pick-strength-level"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
+        }}
+      />
     </Stack>
   );
 }

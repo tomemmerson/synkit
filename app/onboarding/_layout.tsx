@@ -31,6 +31,13 @@ export default function StackLayout() {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="pick-workout"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
+        }}
+      />
     </Stack>
   );
 }

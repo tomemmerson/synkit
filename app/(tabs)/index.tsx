@@ -50,7 +50,7 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
-  SheetManager.show("mood-sheet");
+  // SheetManager.show("mood-sheet");
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />

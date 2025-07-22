@@ -8,13 +8,9 @@ import {
 
 interface CalendarWidgetProps {
   currentDate: string;
-  username: string;
 }
 
-const CalendarWidget: React.FC<CalendarWidgetProps> = ({
-  currentDate,
-  username,
-}) => {
+const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
   const daysOfWeek = [
     { day: "M", status: "active" },
     { day: "T", status: "active" },
@@ -40,13 +36,6 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Good morning,</Text>
-          <Text style={styles.username}>{username}!</Text>
-        </View>
-      </View>
-
       <View style={styles.dateHeader}>
         <Text style={styles.dateText}>{currentDate}</Text>
         <View style={styles.dateNavigation}>
@@ -106,20 +95,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 20,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 32,
-    fontWeight: "600",
-    color: "#614178",
-    marginBottom: 4,
-  },
-  username: {
-    fontSize: 32,
-    fontWeight: "300",
-    color: "#9294AC",
   },
   dateHeader: {
     flexDirection: "row",

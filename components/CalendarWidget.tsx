@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,16 +17,30 @@ interface CalendarWidgetProps {
   currentDate: Date;
 }
 
+interface DayData {
+  day: string;
+  date: number;
+  status: "current" | "active" | "light" | null;
+  fullDate: Date;
+}
+
+interface WeekData {
+  weekOffset: number;
+  data: DayData[];
+}
+
 const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
   const scrollViewRef = useRef<ScrollView>(null);
+  const lastScrollIndexRef = useRef<number>(2); // Track last scroll position with ref
   const screenWidth = Dimensions.get("window").width;
   const weekWidth = screenWidth - 32; // Account for container padding
 
-  // Helper function to get day abbreviation
-  const getDayAbbr = (dayIndex: number) => {
-    const days = ["S", "M", "T", "W", "T", "F", "S"];
-    return days[dayIndex];
-  };
+  // State for managing weeks
+  const [weeks, setWeeks] = useState<WeekData[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Window size - total number of weeks to keep loaded
+  const WINDOW_SIZE = 5;
 
   // Helper function to format date for display
   const formatCurrentDate = (date: Date) => {
@@ -38,63 +52,113 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
     return `Today, ${date.toLocaleDateString("en-US", options)}`;
   };
 
-  // Generate multiple weeks of data for horizontal scrolling
-  const generateWeeksData = () => {
-    const weeks = [];
+  // Generate a single week of data
+  const generateWeekData = useCallback(
+    (weekOffset: number): WeekData => {
+      // Get the start of the current week (Monday)
+      const currentWeekStart = new Date(currentDate);
+      const dayOfWeek = currentDate.getDay();
+      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday = 0, so 6 days from Monday
+      currentWeekStart.setDate(currentDate.getDate() - daysFromMonday);
 
-    // Get the start of the current week (Sunday)
-    const currentWeekStart = new Date(currentDate);
-    const dayOfWeek = currentDate.getDay();
-    currentWeekStart.setDate(currentDate.getDate() - dayOfWeek);
-
-    // Generate 3 weeks: previous, current, next
-    for (let weekOffset = -1; weekOffset <= 1; weekOffset++) {
+      // Calculate the specific week
       const weekStart = new Date(currentWeekStart);
       weekStart.setDate(currentWeekStart.getDate() + weekOffset * 7);
 
-      const week = [];
-      for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+      const week: DayData[] = [];
+      const dayAbbreviations = ["M", "T", "W", "T", "F", "S", "S"];
+
+      for (let i = 0; i < 7; i++) {
         const day = new Date(weekStart);
-        day.setDate(weekStart.getDate() + dayOffset);
+        day.setDate(weekStart.getDate() + i);
 
-        // Determine status (this is sample data - you can customize this logic)
-        let status = null;
-        const today = new Date(currentDate);
+        let status: DayData["status"] = null;
 
-        if (day.toDateString() === today.toDateString()) {
+        // Check if it's today
+        if (day.toDateString() === currentDate.toDateString()) {
           status = "current";
-        } else if (day < today) {
-          // Past dates - random sample data
-          const random = Math.random();
-          if (random < 0.3) status = "active";
-          else if (random < 0.5) status = "light";
+        } else if (day < currentDate) {
+          // Simple past date logic
+          const dayHash = day.getDate() % 4;
+          if (dayHash === 1) status = "active";
+          else if (dayHash === 2) status = "light";
         }
 
         week.push({
-          day: getDayAbbr(day.getDay()),
+          day: dayAbbreviations[i],
           date: day.getDate(),
-          status: status,
+          status,
           fullDate: day,
         });
       }
-      weeks.push(week);
+
+      return { weekOffset, data: week };
+    },
+    [currentDate]
+  );
+
+  // Initialize weeks data
+  useEffect(() => {
+    const initialWeeks: WeekData[] = [];
+
+    // Generate 5 weeks: 2 before, current, 2 after
+    for (let i = -2; i <= 2; i++) {
+      initialWeeks.push(generateWeekData(i));
     }
 
-    return weeks;
-  };
+    setWeeks(initialWeeks);
+    setIsInitialized(true);
+  }, [generateWeekData]);
 
-  const weeksData = generateWeeksData();
-
-  // Scroll to current week on mount
+  // Scroll to current week on initialization
   useEffect(() => {
-    if (scrollViewRef.current) {
-      // Scroll to the middle week (current week) - index 1
+    if (isInitialized && scrollViewRef.current) {
+      // Current week is always at index 2 (middle of 5 weeks)
       scrollViewRef.current.scrollTo({
-        x: weekWidth,
+        x: 2 * weekWidth,
         animated: false,
       });
     }
-  }, [weekWidth]);
+  }, [isInitialized, weekWidth]);
+
+  // Handle scroll events with sliding window
+  const handleScroll = useCallback(
+    (event: any) => {
+      const { contentOffset } = event.nativeEvent;
+      const scrollPosition = contentOffset.x;
+      const currentIndex = Math.round(scrollPosition / weekWidth);
+      const direction = currentIndex > lastScrollIndexRef.current ? 1 : -1; // 1 = right, -1 = left
+
+      // console.log(event.nativeEvent);
+      console.log({
+        currentIndex,
+        lastScrollIndex: lastScrollIndexRef.current,
+        offset: contentOffset.x,
+        weekWidth,
+        direction,
+      });
+
+      // Only update if the index has changed
+      if (currentIndex !== lastScrollIndexRef.current) {
+        setWeeks((prevWeeks) => {
+          if (direction > 0) {
+            // Scrolling right - add week to end, remove from beginning
+            const lastWeekOffset = prevWeeks[prevWeeks.length - 1].weekOffset;
+            const newWeek = generateWeekData(lastWeekOffset + 1);
+            return [...prevWeeks.slice(1), newWeek];
+          } else {
+            // Scrolling left - add week to beginning, remove from end
+            const firstWeekOffset = prevWeeks[0].weekOffset;
+            const newWeek = generateWeekData(firstWeekOffset - 1);
+            return [newWeek, ...prevWeeks.slice(0, -1)];
+          }
+        });
+
+        lastScrollIndexRef.current = currentIndex;
+      }
+    },
+    [weekWidth, generateWeekData]
+  );
 
   const getStatusColor = (status: string | null) => {
     switch (status) {
@@ -134,10 +198,15 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
         decelerationRate="fast"
         contentContainerStyle={styles.scrollContainer}
         style={styles.calendarScroll}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
-        {weeksData.map((week, weekIndex) => (
-          <View key={weekIndex} style={[styles.calendar, { width: weekWidth }]}>
-            {week.map((item, dayIndex) => (
+        {weeks.map((week, weekIndex) => (
+          <View
+            key={`week-${week.weekOffset}`}
+            style={[styles.calendar, { width: weekWidth }]}
+          >
+            {week.data.map((item: DayData, dayIndex: number) => (
               <TouchableOpacity key={dayIndex} style={styles.dayContainer}>
                 <View
                   style={[

@@ -7,7 +7,7 @@ export default function FitnessScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Fitness</Text>
-        <Text style={styles.subtitle}>Your fitness tracking goes here</Text>
+        <Text style={styles.subtitle}>Fitness tracking goes here</Text>
       </View>
     </SafeAreaView>
   );

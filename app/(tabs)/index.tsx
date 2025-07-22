@@ -8,10 +8,28 @@ import { StatusBar } from "expo-status-bar";
 import CalendarWidget from "@/components/CalendarWidget";
 import WorkoutCard from "@/components/WorkoutCard";
 import StatusCard from "@/components/StatusCard";
+import {
+  faDroplet,
+  faFaceLaugh,
+  faPersonWalking,
+} from "@fortawesome/pro-solid-svg-icons";
+import { SheetManager } from "react-native-actions-sheet";
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
+
+  // Get current time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      return "Good morning,";
+    } else if (hour < 17) {
+      return "Good afternoon,";
+    } else {
+      return "Good evening,";
+    }
+  };
 
   // Header animation values
   const headerOpacity = scrollY.interpolate({
@@ -32,6 +50,7 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
+  SheetManager.show("mood-sheet");
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -62,7 +81,7 @@ export default function HomeScreen() {
         >
           {/* Animated Header */}
           <Animated.View style={[styles.header, { opacity: headerOpacity }]}>
-            <Text style={styles.greeting}>Good morning,</Text>
+            <Text style={styles.greeting}>{getGreeting()}</Text>
             <Text style={styles.username}>Molly!</Text>
           </Animated.View>
           {/* Header with Calendar */}
@@ -103,34 +122,39 @@ export default function HomeScreen() {
                 <View style={styles.cardRow}>
                   <View style={styles.halfCard}>
                     <StatusCard
-                      type="period"
+                      type="Period"
                       title="Light"
                       subtitle="Day 1"
                       status="completed"
-                      color="#E29B9B"
+                      color="#E29A96"
                       onPress={() => console.log("Period log pressed")}
+                      icon={faDroplet}
                     />
                   </View>
                   <View style={styles.halfCard}>
                     <StatusCard
-                      type="mood"
+                      type="Mood"
                       title="Happy"
                       subtitle="-"
                       status="add"
-                      color="#A28BD1"
-                      onPress={() => console.log("Mood pressed")}
+                      color="#D196E2"
+                      onPress={() => {
+                        SheetManager.show("mood-sheet");
+                      }}
+                      icon={faFaceLaugh}
                     />
                   </View>
                 </View>
 
                 <View style={styles.fullCard}>
                   <StatusCard
-                    type="workout"
+                    type="Workout"
                     title="Logged"
                     subtitle="Moderate"
                     status="add"
-                    color="#F5D982"
+                    color="#ECCD97"
                     onPress={() => console.log("Workout log pressed")}
+                    icon={faPersonWalking}
                   />
                 </View>
               </View>
@@ -184,7 +208,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 32,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#614178",
     marginBottom: 4,
   },

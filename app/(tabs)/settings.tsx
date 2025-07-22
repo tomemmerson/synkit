@@ -2,12 +2,12 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function NutritionScreen() {
+export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Nutrition</Text>
-        <Text style={styles.subtitle}>Your nutrition tracking goes here</Text>
+        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.subtitle}>Settings goes here</Text>
       </View>
     </SafeAreaView>
   );

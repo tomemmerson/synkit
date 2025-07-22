@@ -48,7 +48,11 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.difficultyContainer}>

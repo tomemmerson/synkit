@@ -30,17 +30,18 @@ interface WeekData {
 }
 
 const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
+  // Window size - total number of weeks to keep loaded
+  const WINDOW_SIZE = 30;
+
   const scrollViewRef = useRef<ScrollView>(null);
-  const lastScrollIndexRef = useRef<number>(2); // Track last scroll position with ref
+  const lastScrollIndexRef = useRef<number>(Math.floor(WINDOW_SIZE / 2)); // Track last scroll position with ref
+  const isAdjustingScrollRef = useRef<boolean>(false); // Prevent overlapping scroll adjustments
   const screenWidth = Dimensions.get("window").width;
   const weekWidth = screenWidth - 32; // Account for container padding
 
   // State for managing weeks
   const [weeks, setWeeks] = useState<WeekData[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // Window size - total number of weeks to keep loaded
-  const WINDOW_SIZE = 5;
 
   // Helper function to format date for display
   const formatCurrentDate = (date: Date) => {
@@ -100,80 +101,138 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
   // Initialize weeks data
   useEffect(() => {
     const initialWeeks: WeekData[] = [];
+    const centerOffset = Math.floor(WINDOW_SIZE / 2);
 
-    // Generate 5 weeks: 2 before, current, 2 after
-    for (let i = -2; i <= 2; i++) {
+    // Generate WINDOW_SIZE weeks: centered around current week
+    for (let i = -centerOffset; i <= centerOffset; i++) {
       initialWeeks.push(generateWeekData(i));
     }
 
     setWeeks(initialWeeks);
     setIsInitialized(true);
-  }, [generateWeekData]);
+  }, [generateWeekData, WINDOW_SIZE]);
 
   // Scroll to current week on initialization
   useEffect(() => {
     if (isInitialized && scrollViewRef.current) {
-      // Current week is always at index 2 (middle of 5 weeks)
+      // Current week is always at the center of the window
+      const centerIndex = Math.floor(WINDOW_SIZE / 2);
       scrollViewRef.current.scrollTo({
-        x: 2 * weekWidth,
+        x: centerIndex * weekWidth,
         animated: false,
       });
     }
-  }, [isInitialized, weekWidth]);
+  }, [isInitialized, weekWidth, WINDOW_SIZE]);
 
-  // Handle scroll events with sliding window
-  const handleScroll = useCallback(
+  // Handle scroll end events with sliding window
+  const handleScrollEnd = useCallback(
     (event: any) => {
+      // Prevent overlapping scroll adjustments
+      if (isAdjustingScrollRef.current) {
+        console.log("Scroll adjustment in progress, ignoring");
+        return;
+      }
+
       const { contentOffset } = event.nativeEvent;
       const scrollPosition = contentOffset.x;
       const currentIndex = Math.round(scrollPosition / weekWidth);
-      const direction = currentIndex > lastScrollIndexRef.current ? 1 : -1; // 1 = right, -1 = left
+      const centerIndex = Math.floor(WINDOW_SIZE / 2);
 
-      // console.log(event.nativeEvent);
       console.log({
         currentIndex,
         lastScrollIndex: lastScrollIndexRef.current,
         offset: contentOffset.x,
         weekWidth,
-        direction,
+        centerIndex,
+        windowSize: WINDOW_SIZE,
+        isAdjusting: isAdjustingScrollRef.current,
       });
 
-      // Only update if the index has changed
-      if (currentIndex !== lastScrollIndexRef.current) {
+      // Only trigger sliding window when at the edges of the window
+      // Edge conditions: index 0 (far left) or index WINDOW_SIZE-1 (far right)
+      const isAtLeftEdge = currentIndex === 0;
+      const isAtRightEdge = currentIndex === WINDOW_SIZE - 1;
+
+      if (
+        currentIndex !== lastScrollIndexRef.current &&
+        (isAtLeftEdge || isAtRightEdge)
+      ) {
+        isAdjustingScrollRef.current = true;
+        const direction = currentIndex > lastScrollIndexRef.current ? 1 : -1; // 1 = right, -1 = left
+
+        console.log(
+          `Triggered sliding window: ${direction > 0 ? "right" : "left"} edge`
+        );
+
         setWeeks((prevWeeks) => {
-          if (direction > 0) {
+          if (direction > 0 && isAtRightEdge) {
             // Scrolling right - add week to end, remove from beginning
             const lastWeekOffset = prevWeeks[prevWeeks.length - 1].weekOffset;
             const newWeek = generateWeekData(lastWeekOffset + 1);
-            const newWeeks = [...prevWeeks, newWeek];
-            console.log("New weeks after scrolling right:", newWeeks);
+            const newWeeks = [...prevWeeks.slice(1), newWeek];
+            console.log(
+              "New weeks after scrolling right:",
+              newWeeks.map((w) => w.weekOffset)
+            );
             return newWeeks;
-          } else {
+          } else if (direction < 0 && isAtLeftEdge) {
             // Scrolling left - add week to beginning, remove from end
             const firstWeekOffset = prevWeeks[0].weekOffset;
             const newWeek = generateWeekData(firstWeekOffset - 1);
-            const newWeeks = [...prevWeeks, newWeek];
-            console.log("New weeks after scrolling left:", newWeeks);
+            const newWeeks = [newWeek, ...prevWeeks.slice(0, -1)];
+            console.log(
+              "New weeks after scrolling left:",
+              newWeeks.map((w) => w.weekOffset)
+            );
             return newWeeks;
           }
+          return prevWeeks;
         });
 
-        lastScrollIndexRef.current =
-          direction > 0 ? currentIndex + 1 : currentIndex - 1;
+        // Adjust scroll position to maintain visual continuity
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            let adjustedScrollPosition;
 
-        // setTimeout(() => {
-        //   if (scrollViewRef.current) {
-        //     const adjustedScrollPosition = currentIndex * weekWidth;
-        //     console.log("Adjusting scroll to:", adjustedScrollPosition);
-        //     scrollViewRef.current.scrollTo({
-        //       x: adjustedScrollPosition,
-        //       animated: false,
-        //     });
-        //   }
-        // }, 0);
+            if (direction > 0 && isAtRightEdge) {
+              // When scrolling right and hitting the right edge,
+              // we removed the first week and added to the end
+              // User should stay at the same visual position (centerIndex)
+              adjustedScrollPosition = centerIndex * weekWidth;
+            } else if (direction < 0 && isAtLeftEdge) {
+              // When scrolling left and hitting the left edge,
+              // we added to the beginning and removed from the end
+              // User should move to position 1 (since we added a week at the beginning)
+              adjustedScrollPosition = 1 * weekWidth;
+            } else {
+              // Fallback to center
+              adjustedScrollPosition = centerIndex * weekWidth;
+            }
+
+            console.log(
+              "Adjusting scroll position:",
+              adjustedScrollPosition,
+              `(index: ${adjustedScrollPosition / weekWidth})`
+            );
+
+            scrollViewRef.current.scrollTo({
+              x: adjustedScrollPosition,
+              animated: false,
+            });
+
+            // Update refs after scroll adjustment
+            lastScrollIndexRef.current = Math.round(
+              adjustedScrollPosition / weekWidth
+            );
+            isAdjustingScrollRef.current = false;
+          }
+        }, 10);
+      } else {
+        // Just update the ref for normal scrolling within the safe range
+        lastScrollIndexRef.current = currentIndex;
       }
     },
-    [weekWidth, generateWeekData]
+    [weekWidth, generateWeekData, WINDOW_SIZE]
   );
 
   const getStatusColor = (status: string | null) => {
@@ -214,7 +273,8 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
         decelerationRate="fast"
         contentContainerStyle={styles.scrollContainer}
         style={styles.calendarScroll}
-        onScroll={handleScroll}
+        onScrollEndDrag={handleScrollEnd}
+        onMomentumScrollEnd={handleScrollEnd}
         scrollEventThrottle={16}
       >
         {weeks.map((week, weekIndex) => (

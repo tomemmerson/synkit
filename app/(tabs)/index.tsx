@@ -67,7 +67,7 @@ export default function HomeScreen() {
           </Animated.View>
           {/* Header with Calendar */}
           <View style={styles.contentPadding}>
-            <CalendarWidget currentDate="Today, 20 June" />
+            <CalendarWidget currentDate={new Date()} />
 
             {/* Today's Workout Section */}
             <View style={styles.sectionContainer}>

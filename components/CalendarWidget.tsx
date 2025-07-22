@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faChevronLeft,
@@ -7,19 +14,87 @@ import {
 } from "@fortawesome/pro-light-svg-icons";
 
 interface CalendarWidgetProps {
-  currentDate: string;
+  currentDate: Date;
 }
 
 const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
-  const daysOfWeek = [
-    { day: "M", status: "active" },
-    { day: "T", status: "active" },
-    { day: "W", status: "light" },
-    { day: "F", status: null },
-    { day: "S", status: "light" },
-    { day: "M", status: null },
-    { day: "S", status: "current" },
-  ];
+  const scrollViewRef = useRef<ScrollView>(null);
+  const screenWidth = Dimensions.get("window").width;
+  const weekWidth = screenWidth - 32; // Account for container padding
+
+  // Helper function to get day abbreviation
+  const getDayAbbr = (dayIndex: number) => {
+    const days = ["S", "M", "T", "W", "T", "F", "S"];
+    return days[dayIndex];
+  };
+
+  // Helper function to format date for display
+  const formatCurrentDate = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    };
+    return `Today, ${date.toLocaleDateString("en-US", options)}`;
+  };
+
+  // Generate multiple weeks of data for horizontal scrolling
+  const generateWeeksData = () => {
+    const weeks = [];
+
+    // Get the start of the current week (Sunday)
+    const currentWeekStart = new Date(currentDate);
+    const dayOfWeek = currentDate.getDay();
+    currentWeekStart.setDate(currentDate.getDate() - dayOfWeek);
+
+    // Generate 3 weeks: previous, current, next
+    for (let weekOffset = -1; weekOffset <= 1; weekOffset++) {
+      const weekStart = new Date(currentWeekStart);
+      weekStart.setDate(currentWeekStart.getDate() + weekOffset * 7);
+
+      const week = [];
+      for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+        const day = new Date(weekStart);
+        day.setDate(weekStart.getDate() + dayOffset);
+
+        // Determine status (this is sample data - you can customize this logic)
+        let status = null;
+        const today = new Date(currentDate);
+
+        if (day.toDateString() === today.toDateString()) {
+          status = "current";
+        } else if (day < today) {
+          // Past dates - random sample data
+          const random = Math.random();
+          if (random < 0.3) status = "active";
+          else if (random < 0.5) status = "light";
+        }
+
+        week.push({
+          day: getDayAbbr(day.getDay()),
+          date: day.getDate(),
+          status: status,
+          fullDate: day,
+        });
+      }
+      weeks.push(week);
+    }
+
+    return weeks;
+  };
+
+  const weeksData = generateWeeksData();
+
+  // Scroll to current week on mount
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      // Scroll to the middle week (current week) - index 1
+      scrollViewRef.current.scrollTo({
+        x: weekWidth,
+        animated: false,
+      });
+    }
+  }, [weekWidth]);
 
   const getStatusColor = (status: string | null) => {
     switch (status) {
@@ -37,7 +112,9 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
-        <Text style={styles.dateText}>{currentDate}</Text>
+        <Text style={styles.headerDateText}>
+          {formatCurrentDate(currentDate)}
+        </Text>
         <View style={styles.dateNavigation}>
           <TouchableOpacity style={styles.navButton}>
             <FontAwesomeIcon icon={faChevronLeft} size={16} color="#9294AC" />
@@ -48,45 +125,66 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
         </View>
       </View>
 
-      <View style={styles.calendar}>
-        {daysOfWeek.map((item, index) => (
-          <View key={index} style={styles.dayContainer}>
-            <View
-              style={[
-                styles.dayButton,
-                item.status === "current" && styles.currentDay,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.dayText,
-                  item.status === "current" && styles.currentDayText,
-                ]}
-              >
-                {item.day}
-              </Text>
-            </View>
-            {item.status && item.status !== "current" && (
-              <View style={styles.dotsContainer}>
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        pagingEnabled
+        snapToInterval={weekWidth}
+        decelerationRate="fast"
+        contentContainerStyle={styles.scrollContainer}
+        style={styles.calendarScroll}
+      >
+        {weeksData.map((week, weekIndex) => (
+          <View key={weekIndex} style={[styles.calendar, { width: weekWidth }]}>
+            {week.map((item, dayIndex) => (
+              <TouchableOpacity key={dayIndex} style={styles.dayContainer}>
                 <View
                   style={[
-                    styles.dot,
-                    { backgroundColor: getStatusColor(item.status) },
+                    styles.dayButton,
+                    item.status === "current" && styles.currentDay,
                   ]}
-                />
-                {item.status === "active" && (
-                  <View
+                >
+                  <Text
                     style={[
-                      styles.dot,
-                      { backgroundColor: getStatusColor(item.status) },
+                      styles.dayText,
+                      item.status === "current" && styles.currentDayText,
                     ]}
-                  />
+                  >
+                    {item.day}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.dateText,
+                      item.status === "current" && styles.currentDateText,
+                    ]}
+                  >
+                    {item.date}
+                  </Text>
+                </View>
+                {item.status && item.status !== "current" && (
+                  <View style={styles.dotsContainer}>
+                    <View
+                      style={[
+                        styles.dot,
+                        { backgroundColor: getStatusColor(item.status) },
+                      ]}
+                    />
+                    {item.status === "active" && (
+                      <View
+                        style={[
+                          styles.dot,
+                          { backgroundColor: getStatusColor(item.status) },
+                        ]}
+                      />
+                    )}
+                  </View>
                 )}
-              </View>
-            )}
+              </TouchableOpacity>
+            ))}
           </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -102,7 +200,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  dateText: {
+  headerDateText: {
     fontSize: 18,
     fontWeight: "600",
     color: "#2B2E46",
@@ -119,32 +217,49 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  calendarScroll: {
+    flexGrow: 0,
+  },
+  scrollContainer: {
+    paddingHorizontal: 0,
+  },
   calendar: {
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingHorizontal: 5,
   },
   dayContainer: {
     alignItems: "center",
-    width: 40,
+    width: 45,
   },
   dayButton: {
-    width: 40,
-    height: 60,
+    width: 45,
+    height: 70,
     borderRadius: 20,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
+    paddingVertical: 8,
   },
   currentDay: {
     backgroundColor: "#614178",
   },
   dayText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "500",
     color: "#9294AC",
+    marginBottom: 4,
   },
   currentDayText: {
+    color: "#FFFFFF",
+  },
+  dateText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#2B2E46",
+  },
+  currentDateText: {
     color: "#FFFFFF",
   },
   dotsContainer: {

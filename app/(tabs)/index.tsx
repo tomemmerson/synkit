@@ -127,7 +127,7 @@ export default function HomeScreen() {
                       subtitle="Day 1"
                       status="completed"
                       color="#E29A96"
-                      onPress={() => console.log("Period log pressed")}
+                      onPress={() => SheetManager.show("period-sheet")}
                       icon={faDroplet}
                     />
                   </View>

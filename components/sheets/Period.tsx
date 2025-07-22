@@ -7,64 +7,79 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faAngry,
   faDizzy,
+  faDroplet,
   faSadTear,
   faSmile,
 } from "@fortawesome/pro-solid-svg-icons";
 
-const moodOptions: SelectionOption[] = [
+const periodOptions: SelectionOption[] = [
   {
-    id: "happy",
+    id: "light",
     icon: {
-      icon: faSmile,
-      color: "#94D38D",
+      icon: faDroplet,
+      color: "#E29A96",
+      size: 20,
     },
-    label: "Happy",
+    label: "Light",
   },
   {
-    id: "sad",
+    id: "medium",
     icon: {
-      icon: faSadTear,
-      color: "#D3A98D",
+      icon: faDroplet,
+      color: "#E29A96",
+      size: 25,
     },
-    label: "Sad",
+    label: "Medium",
   },
   {
-    id: "overwhelmed",
+    id: "heavy",
     icon: {
-      icon: faDizzy,
-      color: "#5F2E71",
+      icon: faDroplet,
+      color: "#E29A96",
+      size: 34,
     },
-    label: "Overwhelmed",
+    label: "Heavy",
   },
   {
-    id: "angry",
+    id: "very-heavy",
     icon: {
-      icon: faAngry,
-      color: "#5F2E71",
+      icon: faDroplet,
+      color: "#E29A96",
+      size: 40,
     },
-    label: "Angry",
+    label: "Very heavy",
   },
 ];
 
-function MoodSheet() {
-  const [selectedMood, setSelectedMood] = useState<string>("sad");
+function PeriodSheet() {
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("medium");
 
-  const handleMoodSelect = (moodId: string) => {
-    setSelectedMood(moodId);
+  const handlePeriodSelect = (periodId: string) => {
+    setSelectedPeriod(periodId);
   };
 
-  const handleLogMood = () => {
-    // Handle mood logging logic here
-    console.log("Selected mood:", selectedMood);
+  const handleLogPeriod = () => {
+    // Handle period logging logic here
+    console.log("Selected period:", selectedPeriod);
   };
 
   return (
-    <BaseSheet title="Mood" buttonName="Log Mood" onSelect={handleLogMood}>
+    <BaseSheet
+      title="Period"
+      buttonName="Log Period"
+      onSelect={handleLogPeriod}
+    >
       <SelectionScroll
-        options={moodOptions}
-        selectedId={selectedMood}
-        onSelect={handleMoodSelect}
-        style={styles.moodContainer}
+        title="Flow"
+        options={periodOptions}
+        selectedId={selectedPeriod}
+        onSelect={handlePeriodSelect}
+      />
+      <SelectionScroll
+        title="Symptoms"
+        options={periodOptions}
+        selectedId={selectedPeriod}
+        onSelect={handlePeriodSelect}
       />
     </BaseSheet>
   );
@@ -107,4 +122,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MoodSheet;
+export default PeriodSheet;

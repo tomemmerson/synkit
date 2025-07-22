@@ -145,16 +145,32 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
             // Scrolling right - add week to end, remove from beginning
             const lastWeekOffset = prevWeeks[prevWeeks.length - 1].weekOffset;
             const newWeek = generateWeekData(lastWeekOffset + 1);
-            return [...prevWeeks.slice(1), newWeek];
+            const newWeeks = [...prevWeeks, newWeek];
+            console.log("New weeks after scrolling right:", newWeeks);
+            return newWeeks;
           } else {
             // Scrolling left - add week to beginning, remove from end
             const firstWeekOffset = prevWeeks[0].weekOffset;
             const newWeek = generateWeekData(firstWeekOffset - 1);
-            return [newWeek, ...prevWeeks.slice(0, -1)];
+            const newWeeks = [...prevWeeks, newWeek];
+            console.log("New weeks after scrolling left:", newWeeks);
+            return newWeeks;
           }
         });
 
-        lastScrollIndexRef.current = currentIndex;
+        lastScrollIndexRef.current =
+          direction > 0 ? currentIndex + 1 : currentIndex - 1;
+
+        // setTimeout(() => {
+        //   if (scrollViewRef.current) {
+        //     const adjustedScrollPosition = currentIndex * weekWidth;
+        //     console.log("Adjusting scroll to:", adjustedScrollPosition);
+        //     scrollViewRef.current.scrollTo({
+        //       x: adjustedScrollPosition,
+        //       animated: false,
+        //     });
+        //   }
+        // }, 0);
       }
     },
     [weekWidth, generateWeekData]

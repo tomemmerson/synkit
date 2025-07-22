@@ -37,7 +37,7 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
   const lastScrollIndexRef = useRef<number>(Math.floor(WINDOW_SIZE / 2)); // Track last scroll position with ref
   const isAdjustingScrollRef = useRef<boolean>(false); // Prevent overlapping scroll adjustments
   const screenWidth = Dimensions.get("window").width;
-  const weekWidth = screenWidth - 32; // Account for container padding
+  const weekWidth = screenWidth; // Account for container padding
 
   // State for managing weeks
   const [weeks, setWeeks] = useState<WeekData[]>([]);
@@ -336,14 +336,14 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingVertical: 10,
   },
   dateHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+    paddingHorizontal: 16,
   },
   headerDateText: {
     fontSize: 18,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   calendar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 5,
+    paddingHorizontal: 16,
   },
   dayContainer: {
     alignItems: "center",
@@ -379,8 +379,8 @@ const styles = StyleSheet.create({
   },
   dayButton: {
     width: 45,
-    height: 70,
-    borderRadius: 20,
+    height: 85,
+    borderRadius: 17,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
@@ -389,6 +389,8 @@ const styles = StyleSheet.create({
   },
   currentDay: {
     backgroundColor: "#614178",
+    borderWidth: 2,
+    borderColor: "#4B325C",
   },
   dayText: {
     fontSize: 12,

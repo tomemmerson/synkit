@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faPlus } from "@fortawesome/pro-light-svg-icons";
+import { faBolt, faPlus } from "@fortawesome/pro-solid-svg-icons";
 
 interface WorkoutCardProps {
   title: string;
@@ -41,7 +41,9 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
           styles.difficultyDot,
           index < activeDots ? styles.activeDot : styles.inactiveDot,
         ]}
-      />
+      >
+        <FontAwesomeIcon icon={faBolt} size={7} color="#F8E4C1" />
+      </View>
     ));
   };
 
@@ -56,69 +58,86 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
             <Text style={styles.difficultyText}>{difficulty} difficulty</Text>
           </View>
           <TouchableOpacity style={styles.addButton}>
-            <FontAwesomeIcon icon={faPlus} size={16} color="#614178" />
+            <FontAwesomeIcon icon={faPlus} size={16} color="white" />
           </TouchableOpacity>
         </View>
+        <View style={styles.textContent}>
+          <Text style={styles.title}>{title}</Text>
 
-        <Text style={styles.title}>{title}</Text>
-
-        <Text style={styles.details}>
-          {duration} • {exercises} exercises
-        </Text>
+          <Text style={styles.details}>
+            {duration} • {exercises} exercises
+          </Text>
+        </View>
       </View>
 
       <View style={styles.imageContainer}>
         <Image
-          source={require("../assets/images/strength-workout.png")}
+          source={require("../assets/images/movements/moving-workout.png")}
           style={styles.workoutImage}
           resizeMode="contain"
         />
       </View>
+      <View style={styles.backgroundBlob} />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F5D982",
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: "#F8E2BD",
+    borderRadius: 28,
+    paddingHorizontal: 17,
+    paddingVertical: 20,
     marginHorizontal: 16,
     marginBottom: 20,
     flexDirection: "row",
     alignItems: "flex-end",
     minHeight: 140,
+    borderWidth: 1,
+    borderColor: "#E1C593",
+    overflow: "hidden",
+    boxShadow: "0px 4px 11px rgba(0, 0, 0, 0.05)",
   },
   content: {
-    flex: 1,
-    justifyContent: "space-between",
-    height: "100%",
+    width: "100%",
+    gap: 10,
+  },
+  textContent: {
+    width: "55%",
+    gap: 0,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 12,
+    display: "flex",
   },
   difficultyContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    backgroundColor: "#F8E4C1",
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    borderRadius: 20,
   },
   difficultyDots: {
     flexDirection: "row",
-    gap: 2,
+    gap: 4,
   },
   difficultyDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 13,
+    height: 13,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    display: "flex",
   },
   activeDot: {
-    backgroundColor: "#614178",
+    backgroundColor: "#65417C",
   },
   inactiveDot: {
-    backgroundColor: "#D1D1D1",
+    backgroundColor: "#C5A6A6",
   },
   difficultyText: {
     fontSize: 12,
@@ -126,34 +145,49 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   addButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    width: 35,
+    height: 35,
+    borderRadius: 14,
+    backgroundColor: "#EBCA90",
     alignItems: "center",
     justifyContent: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 34,
     fontWeight: "700",
-    color: "#614178",
+    color: "#5F2E71",
     marginBottom: 8,
-    lineHeight: 28,
+    lineHeight: 34,
   },
   details: {
     fontSize: 14,
-    color: "#614178",
-    fontWeight: "500",
+    color: "#5F2E71",
+    fontWeight: "400",
   },
   imageContainer: {
-    width: 80,
-    height: 80,
+    right: 20,
+    position: "absolute",
+    width: 100,
+    height: 140,
+    bottom: 12,
     alignItems: "center",
     justifyContent: "center",
   },
   workoutImage: {
-    width: 70,
-    height: 70,
+    height: 150,
+    top: 30,
+    right: 15,
+  },
+  backgroundBlob: {
+    position: "absolute",
+    top: "-20%",
+    left: "-100%",
+    right: 60,
+    bottom: "-20%",
+    backgroundColor: "#F5D6A0",
+    borderRadius: 100,
+    zIndex: -1,
+    opacity: 0.8,
   },
 });
 

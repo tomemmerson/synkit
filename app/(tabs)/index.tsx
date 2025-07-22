@@ -66,13 +66,22 @@ export default function HomeScreen() {
             <Text style={styles.username}>Molly!</Text>
           </Animated.View>
           {/* Header with Calendar */}
+          <CalendarWidget currentDate={new Date()} />
           <View style={styles.contentPadding}>
-            <CalendarWidget currentDate={new Date()} />
-
             {/* Today's Workout Section */}
+            <View
+              style={{
+                width: "100%",
+                height: 1,
+                backgroundColor: "#E3E3E3",
+                marginHorizontal: 16,
+                marginBottom: 32,
+                marginTop: 0,
+              }}
+            />
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Todays Workout</Text>
-              {/* <WorkoutCard
+              <WorkoutCard
                 title="Low Impact Workout"
                 difficulty="Medium"
                 duration="45min"
@@ -81,7 +90,7 @@ export default function HomeScreen() {
                   // Handle workout press
                   console.log("Workout pressed");
                 }}
-              /> */}
+              />
             </View>
 
             {/* How are you feeling today section */}
@@ -170,7 +179,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   header: {
-    marginBottom: 0,
+    marginBottom: 20,
     paddingHorizontal: 16,
   },
   greeting: {
@@ -186,7 +195,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#614178",
     marginBottom: 16,
     paddingHorizontal: 16,

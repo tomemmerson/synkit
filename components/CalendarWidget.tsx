@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Pressable,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -14,7 +15,7 @@ import {
 } from "@fortawesome/pro-light-svg-icons";
 
 interface CalendarWidgetProps {
-  currentDate: Date;
+  selectedDate: Date;
   onClick?: (date: Date) => void;
 }
 
@@ -31,7 +32,7 @@ interface WeekData {
 }
 
 const CalendarWidget: React.FC<CalendarWidgetProps> = ({
-  currentDate,
+  selectedDate,
   onClick,
 }) => {
   const todaysDate = new Date();
@@ -50,7 +51,7 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Helper function to format date for display
-  const formatCurrentDate = (date: Date) => {
+  const formatSelectedDate = (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
       weekday: "long",
       day: "numeric",
@@ -107,10 +108,10 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   // Initialize weeks data
   useEffect(() => {
     const initialWeeks: WeekData[] = [];
-    const centerOffset = Math.floor(WINDOW_SIZE / 2);
 
-    // Generate WINDOW_SIZE weeks: centered around current week
-    for (let i = -centerOffset; i <= centerOffset; i++) {
+    // Generate WINDOW_SIZE weeks: all in the past and current week, no future weeks
+    // Start from -(WINDOW_SIZE-1) and go to 0 (current week)
+    for (let i = -(WINDOW_SIZE - 1); i <= 0; i++) {
       initialWeeks.push(generateWeekData(i));
     }
 
@@ -121,12 +122,13 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   // Scroll to current week on initialization
   useEffect(() => {
     if (isInitialized && scrollViewRef.current) {
-      // Current week is always at the center of the window
-      const centerIndex = Math.floor(WINDOW_SIZE / 2);
+      // Current week is now at the last position (WINDOW_SIZE - 1)
+      const currentWeekIndex = WINDOW_SIZE - 1;
       scrollViewRef.current.scrollTo({
-        x: centerIndex * weekWidth,
+        x: currentWeekIndex * weekWidth,
         animated: false,
       });
+      lastScrollIndexRef.current = currentWeekIndex;
     }
   }, [isInitialized, weekWidth, WINDOW_SIZE]);
 
@@ -142,78 +144,35 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
       const { contentOffset } = event.nativeEvent;
       const scrollPosition = contentOffset.x;
       const currentIndex = Math.round(scrollPosition / weekWidth);
-      const centerIndex = Math.floor(WINDOW_SIZE / 2);
 
-      // console.log({
-      //   currentIndex,
-      //   lastScrollIndex: lastScrollIndexRef.current,
-      //   offset: contentOffset.x,
-      //   weekWidth,
-      //   centerIndex,
-      //   windowSize: WINDOW_SIZE,
-      //   isAdjusting: isAdjustingScrollRef.current,
-      // });
-
-      // Only trigger sliding window when at the edges of the window
-      // Edge conditions: index 0 (far left) or index WINDOW_SIZE-1 (far right)
+      // Only trigger sliding window when at the left edge (index 0)
+      // We don't allow scrolling to the right past the current week
       const isAtLeftEdge = currentIndex === 0;
-      const isAtRightEdge = currentIndex === WINDOW_SIZE - 1;
 
-      if (
-        currentIndex !== lastScrollIndexRef.current &&
-        (isAtLeftEdge || isAtRightEdge)
-      ) {
+      if (currentIndex !== lastScrollIndexRef.current && isAtLeftEdge) {
         isAdjustingScrollRef.current = true;
-        const direction = currentIndex > lastScrollIndexRef.current ? 1 : -1; // 1 = right, -1 = left
 
-        console.log(
-          `Triggered sliding window: ${direction > 0 ? "right" : "left"} edge`
-        );
+        console.log("Triggered sliding window: left edge");
 
         setWeeks((prevWeeks) => {
-          if (direction > 0 && isAtRightEdge) {
-            // Scrolling right - add week to end, remove from beginning
-            const lastWeekOffset = prevWeeks[prevWeeks.length - 1].weekOffset;
-            const newWeek = generateWeekData(lastWeekOffset + 1);
-            const newWeeks = [...prevWeeks.slice(1), newWeek];
-            console.log(
-              "New weeks after scrolling right:",
-              newWeeks.map((w) => w.weekOffset)
-            );
-            return newWeeks;
-          } else if (direction < 0 && isAtLeftEdge) {
-            // Scrolling left - add week to beginning, remove from end
-            const firstWeekOffset = prevWeeks[0].weekOffset;
-            const newWeek = generateWeekData(firstWeekOffset - 1);
-            const newWeeks = [newWeek, ...prevWeeks.slice(0, -1)];
-            console.log(
-              "New weeks after scrolling left:",
-              newWeeks.map((w) => w.weekOffset)
-            );
-            return newWeeks;
-          }
-          return prevWeeks;
+          // Scrolling left - add week to beginning, remove from end
+          const firstWeekOffset = prevWeeks[0].weekOffset;
+          const newWeek = generateWeekData(firstWeekOffset - 1);
+          const newWeeks = [newWeek, ...prevWeeks.slice(0, -1)];
+          console.log(
+            "New weeks after scrolling left:",
+            newWeeks.map((w) => w.weekOffset)
+          );
+          return newWeeks;
         });
 
         // Adjust scroll position to maintain visual continuity
         setTimeout(() => {
-          if (scrollViewRef.current) {
-            let adjustedScrollPosition;
-
-            if (direction > 0 && isAtRightEdge) {
-              // When scrolling right and hitting the right edge,
-              // we removed the first week and added to the end
-              // User should stay at the same visual position (centerIndex)
-              adjustedScrollPosition = centerIndex * weekWidth;
-            } else if (direction < 0 && isAtLeftEdge) {
-              // When scrolling left and hitting the left edge,
-              // we added to the beginning and removed from the end
-              // User should move to position 1 (since we added a week at the beginning)
-              adjustedScrollPosition = 1 * weekWidth;
-            } else {
-              // Fallback to center
-              adjustedScrollPosition = centerIndex * weekWidth;
-            }
+          if (scrollViewRef.current && isAdjustingScrollRef.current) {
+            // When scrolling left and hitting the left edge,
+            // we added to the beginning and removed from the end
+            // User should move to position 1 (since we added a week at the beginning)
+            const adjustedScrollPosition = 1 * weekWidth;
 
             console.log(
               "Adjusting scroll position:",
@@ -257,9 +216,22 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
-        <Text style={styles.headerDateText}>
-          {formatCurrentDate(currentDate)}
-        </Text>
+        <Pressable
+          onPress={() => {
+            if (onClick) {
+              onClick(todaysDate);
+              // scroll to the current week
+              scrollViewRef.current?.scrollTo({
+                x: (WINDOW_SIZE - 1) * weekWidth,
+                animated: true,
+              });
+            }
+          }}
+        >
+          <Text style={styles.headerDateText}>
+            {formatSelectedDate(selectedDate)}
+          </Text>
+        </Pressable>
         <View style={styles.dateNavigation}>
           <TouchableOpacity style={styles.navButton}>
             <FontAwesomeIcon icon={faChevronLeft} size={16} color="#9294AC" />
@@ -302,13 +274,13 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                 <View
                   style={[
                     styles.dayButton,
-                    item.date === currentDate.getDate() && styles.currentDay,
+                    item.date === selectedDate.getDate() && styles.currentDay,
                   ]}
                 >
                   <Text
                     style={[
                       styles.dayText,
-                      item.date === currentDate.getDate() &&
+                      item.date === selectedDate.getDate() &&
                         styles.currentDayText,
                     ]}
                   >
@@ -317,8 +289,8 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                   <Text
                     style={[
                       styles.dateText,
-                      item.date === currentDate.getDate() &&
-                        styles.currentDateText,
+                      item.date === selectedDate.getDate() &&
+                        styles.selectedDateText,
                     ]}
                   >
                     {item.date}
@@ -423,7 +395,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#2B2E46",
   },
-  currentDateText: {
+  selectedDateText: {
     color: "#FFFFFF",
   },
   dotsContainer: {

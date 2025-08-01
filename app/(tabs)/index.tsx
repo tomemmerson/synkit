@@ -90,7 +90,7 @@ export default function HomeScreen() {
           </Animated.View>
           {/* Header with Calendar */}
           <CalendarWidget
-            currentDate={selectedDate}
+            selectedDate={selectedDate}
             onClick={(date) => setSelectedDate(date)}
           />
           <View style={styles.contentPadding}>

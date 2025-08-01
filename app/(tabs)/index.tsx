@@ -14,6 +14,8 @@ import {
   faPersonWalking,
 } from "@fortawesome/pro-solid-svg-icons";
 import { SheetManager } from "react-native-actions-sheet";
+import Heading from "@/components/Heading";
+import Subheading from "@/components/Subheading";
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -50,11 +52,13 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
+
   // SheetManager.show("mood-sheet");
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         {/* Animated Top Bar */}
         <Animated.View
           style={[
@@ -81,11 +85,14 @@ export default function HomeScreen() {
         >
           {/* Animated Header */}
           <Animated.View style={[styles.header, { opacity: headerOpacity }]}>
-            <Text style={styles.greeting}>{getGreeting()}</Text>
+            <Heading style={styles.greeting}>{getGreeting()}</Heading>
             <Text style={styles.username}>Molly!</Text>
           </Animated.View>
           {/* Header with Calendar */}
-          <CalendarWidget currentDate={new Date()} />
+          <CalendarWidget
+            currentDate={selectedDate}
+            onClick={(date) => setSelectedDate(date)}
+          />
           <View style={styles.contentPadding}>
             {/* Today's Workout Section */}
             <View
@@ -99,7 +106,7 @@ export default function HomeScreen() {
               }}
             />
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Todays Workout</Text>
+              <Subheading>Todays Workout</Subheading>
               <WorkoutCard
                 title="Low Impact Workout"
                 difficulty="Medium"
@@ -114,9 +121,7 @@ export default function HomeScreen() {
 
             {/* How are you feeling today section */}
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>
-                How are you feeling today?
-              </Text>
+              <Subheading>How are you feeling today?</Subheading>
 
               <View style={styles.cardsGrid}>
                 <View style={styles.cardRow}>
@@ -198,6 +203,7 @@ const styles = StyleSheet.create({
   },
   contentPadding: {
     paddingTop: 20,
+    paddingHorizontal: 16,
   },
   sectionContainer: {
     marginBottom: 24,
@@ -217,15 +223,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     color: "#9294AC",
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#614178",
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
   cardsGrid: {
-    paddingHorizontal: 16,
     gap: 12,
   },
   cardRow: {

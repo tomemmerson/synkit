@@ -15,6 +15,7 @@ import {
 
 interface CalendarWidgetProps {
   currentDate: Date;
+  onClick?: (date: Date) => void;
 }
 
 interface DayData {
@@ -29,9 +30,14 @@ interface WeekData {
   data: DayData[];
 }
 
-const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
+const CalendarWidget: React.FC<CalendarWidgetProps> = ({
+  currentDate,
+  onClick,
+}) => {
+  const todaysDate = new Date();
+
   // Window size - total number of weeks to keep loaded
-  const WINDOW_SIZE = 30;
+  const WINDOW_SIZE = 6;
 
   const scrollViewRef = useRef<ScrollView>(null);
   const lastScrollIndexRef = useRef<number>(Math.floor(WINDOW_SIZE / 2)); // Track last scroll position with ref
@@ -50,17 +56,17 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
       day: "numeric",
       month: "long",
     };
-    return `Today, ${date.toLocaleDateString("en-US", options)}`;
+    return `${date.toLocaleDateString("en-US", options)}`;
   };
 
   // Generate a single week of data
   const generateWeekData = useCallback(
     (weekOffset: number): WeekData => {
       // Get the start of the current week (Monday)
-      const currentWeekStart = new Date(currentDate);
-      const dayOfWeek = currentDate.getDay();
+      const currentWeekStart = new Date(todaysDate);
+      const dayOfWeek = todaysDate.getDay();
       const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday = 0, so 6 days from Monday
-      currentWeekStart.setDate(currentDate.getDate() - daysFromMonday);
+      currentWeekStart.setDate(todaysDate.getDate() - daysFromMonday);
 
       // Calculate the specific week
       const weekStart = new Date(currentWeekStart);
@@ -76,9 +82,9 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
         let status: DayData["status"] = null;
 
         // Check if it's today
-        if (day.toDateString() === currentDate.toDateString()) {
+        if (day.toDateString() === todaysDate.toDateString()) {
           status = "current";
-        } else if (day < currentDate) {
+        } else if (day < todaysDate) {
           // Simple past date logic
           const dayHash = day.getDate() % 4;
           if (dayHash === 1) status = "active";
@@ -95,7 +101,7 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
 
       return { weekOffset, data: week };
     },
-    [currentDate]
+    [todaysDate.getUTCDate()]
   );
 
   // Initialize weeks data
@@ -138,15 +144,15 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
       const currentIndex = Math.round(scrollPosition / weekWidth);
       const centerIndex = Math.floor(WINDOW_SIZE / 2);
 
-      console.log({
-        currentIndex,
-        lastScrollIndex: lastScrollIndexRef.current,
-        offset: contentOffset.x,
-        weekWidth,
-        centerIndex,
-        windowSize: WINDOW_SIZE,
-        isAdjusting: isAdjustingScrollRef.current,
-      });
+      // console.log({
+      //   currentIndex,
+      //   lastScrollIndex: lastScrollIndexRef.current,
+      //   offset: contentOffset.x,
+      //   weekWidth,
+      //   centerIndex,
+      //   windowSize: WINDOW_SIZE,
+      //   isAdjusting: isAdjustingScrollRef.current,
+      // });
 
       // Only trigger sliding window when at the edges of the window
       // Edge conditions: index 0 (far left) or index WINDOW_SIZE-1 (far right)
@@ -283,17 +289,27 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
             style={[styles.calendar, { width: weekWidth }]}
           >
             {week.data.map((item: DayData, dayIndex: number) => (
-              <TouchableOpacity key={dayIndex} style={styles.dayContainer}>
+              <TouchableOpacity
+                key={dayIndex}
+                style={styles.dayContainer}
+                onPress={() => {
+                  if (onClick) {
+                    console.log("Clicked date:", item.fullDate);
+                    onClick(item.fullDate);
+                  }
+                }}
+              >
                 <View
                   style={[
                     styles.dayButton,
-                    item.status === "current" && styles.currentDay,
+                    item.date === currentDate.getDate() && styles.currentDay,
                   ]}
                 >
                   <Text
                     style={[
                       styles.dayText,
-                      item.status === "current" && styles.currentDayText,
+                      item.date === currentDate.getDate() &&
+                        styles.currentDayText,
                     ]}
                   >
                     {item.day}
@@ -301,7 +317,8 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({ currentDate }) => {
                   <Text
                     style={[
                       styles.dateText,
-                      item.status === "current" && styles.currentDateText,
+                      item.date === currentDate.getDate() &&
+                        styles.currentDateText,
                     ]}
                   >
                     {item.date}

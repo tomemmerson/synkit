@@ -12,7 +12,7 @@ export default function PickStrengthLevelScreen() {
 
   const handleNext = () => {
     // Navigation logic will go here
-    // router.push("/onboarding/next-screen");
+    router.push("/(tabs)");
   };
 
   return (

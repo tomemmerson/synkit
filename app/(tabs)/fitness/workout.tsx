@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Pressable,
+  Animated,
 } from "react-native";
 import {
   SafeAreaView,
@@ -102,6 +103,7 @@ const workoutData: WorkoutSection[] = [
 export default function WorkoutPage() {
   const [activeTab, setActiveTab] = useState("mobility");
   const insets = useSafeAreaInsets();
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const activeSection = workoutData.find((section) => section.id === activeTab);
 
@@ -117,6 +119,21 @@ export default function WorkoutPage() {
     // Handle next action - could navigate to next tab or start workout
     console.log("Next pressed");
   };
+
+  // Animation values for scroll
+  const SCROLL_DISTANCE = 50;
+
+  const durationOpacity = scrollY.interpolate({
+    inputRange: [0, SCROLL_DISTANCE],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  const titlePadding = scrollY.interpolate({
+    inputRange: [0, SCROLL_DISTANCE],
+    outputRange: [20, 8],
+    extrapolate: "clamp",
+  });
 
   const renderExerciseItem = (exercise: Exercise, index: number) => (
     <View key={exercise.id} style={styles.exerciseItem}>
@@ -136,75 +153,88 @@ export default function WorkoutPage() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderBottomColor: "#EEEBF1",
-          backgroundColor: "#FFFFFF",
-          marginBottom: 20,
-        }}
-      >
-        <View style={styles.titleSection}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <FontAwesomeIcon icon={faChevronLeft} size={20} color="#614178" />
-          </TouchableOpacity>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.workoutTitle}>Full body workout</Text>
-            <Text style={styles.workoutDuration}>45mins</Text>
-          </View>
-
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <FontAwesomeIcon icon={faTimes} size={20} color="#614178" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Tab Navigation */}
-        <View style={styles.tabContainer}>
-          {workoutData.map((section) => (
-            <TouchableOpacity
-              key={section.id}
-              style={[styles.tab, activeTab === section.id && styles.activeTab]}
-              onPress={() => setActiveTab(section.id)}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === section.id && styles.activeTabText,
-                ]}
-              >
-                {section.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
       <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-        {/* Header */}
-
-        {/* Content */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{activeSection?.name}</Text>
-            <Text style={styles.sectionDescription}>
-              {activeSection?.description}
-            </Text>
-          </View>
-
-          <View style={styles.exercisesList}>
-            {activeSection?.exercises.map((exercise, index) =>
-              renderExerciseItem(exercise, index)
-            )}
-          </View>
-        </ScrollView>
-
-        {/* Bottom Button */}
         <View
-          style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}
+          style={{
+            borderBottomWidth: 1,
+            borderBottomColor: "#EEEBF1",
+            backgroundColor: "#FFFFFF",
+          }}
         >
-          <Button title="Next" onPress={handleNext} />
+          <Animated.View
+            style={[styles.titleSection, { paddingBottom: titlePadding }]}
+          >
+            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+              <FontAwesomeIcon icon={faChevronLeft} size={20} color="#614178" />
+            </TouchableOpacity>
+
+            <View style={styles.headerCenter}>
+              <Text style={styles.workoutTitle}>Full body workout</Text>
+              <Animated.Text
+                style={[styles.workoutDuration, { opacity: durationOpacity }]}
+              >
+                45mins
+              </Animated.Text>
+            </View>
+
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+              <FontAwesomeIcon icon={faTimes} size={20} color="#614178" />
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Tab Navigation */}
+          <View style={styles.tabContainer}>
+            {workoutData.map((section) => (
+              <TouchableOpacity
+                key={section.id}
+                style={[
+                  styles.tab,
+                  activeTab === section.id && styles.activeTab,
+                ]}
+                onPress={() => setActiveTab(section.id)}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === section.id && styles.activeTabText,
+                  ]}
+                >
+                  {section.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </SafeAreaView>
+
+      {/* Content */}
+      <Animated.ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{activeSection?.name}</Text>
+          <Text style={styles.sectionDescription}>
+            {activeSection?.description}
+          </Text>
+        </View>
+
+        <View style={styles.exercisesList}>
+          {activeSection?.exercises.map((exercise, index) =>
+            renderExerciseItem(exercise, index)
+          )}
+        </View>
+      </Animated.ScrollView>
+
+      {/* Bottom Button */}
+      <View style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}>
+        <Button title="Next" onPress={handleNext} />
+      </View>
     </View>
   );
 }
@@ -215,7 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F7",
   },
   safeArea: {
-    flex: 1,
+    backgroundColor: "#FFFFFF",
   },
   titleSection: {
     flexDirection: "row",
@@ -223,7 +253,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginHorizontal: 20,
     marginVertical: 16,
-    paddingBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#EEEBF1",
   },

@@ -9,10 +9,7 @@ import {
   Pressable,
   Animated,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -43,6 +40,24 @@ const workoutData: WorkoutSection[] = [
       {
         id: "1",
         name: "Hamstring stretch",
+        reps: "10 reps each side",
+        icon: "dumbbell",
+      },
+      {
+        id: "2",
+        name: "Hip rotations",
+        reps: "10 reps each side",
+        icon: "dumbbell",
+      },
+      {
+        id: "2",
+        name: "Hip rotations",
+        reps: "10 reps each side",
+        icon: "dumbbell",
+      },
+      {
+        id: "2",
+        name: "Hip rotations",
         reps: "10 reps each side",
         icon: "dumbbell",
       },
@@ -104,6 +119,7 @@ export default function WorkoutPage() {
   const [activeTab, setActiveTab] = useState("mobility");
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const activeSection = workoutData.find((section) => section.id === activeTab);
 
@@ -153,7 +169,25 @@ export default function WorkoutPage() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+
+      {/* Absolutely positioned header */}
+      <Animated.View
+        style={[
+          styles.absoluteHeader,
+          {
+            paddingTop: insets.top,
+            transform: [
+              {
+                translateY: scrollY.interpolate({
+                  inputRange: [0, SCROLL_DISTANCE],
+                  outputRange: [0, -20],
+                  extrapolate: "clamp",
+                }),
+              },
+            ],
+          },
+        ]}
+      >
         <View
           style={{
             borderBottomWidth: 1,
@@ -205,17 +239,19 @@ export default function WorkoutPage() {
             ))}
           </View>
         </View>
-      </SafeAreaView>
+      </Animated.View>
 
       {/* Content */}
       <Animated.ScrollView
-        style={styles.content}
+        style={[styles.content, { paddingTop: 180 + insets.top }]}
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
         scrollEventThrottle={16}
+        bounces={true}
+        contentContainerStyle={{ paddingBottom: 50 }}
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{activeSection?.name}</Text>
@@ -230,11 +266,6 @@ export default function WorkoutPage() {
           )}
         </View>
       </Animated.ScrollView>
-
-      {/* Bottom Button */}
-      <View style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}>
-        <Button title="Next" onPress={handleNext} />
-      </View>
     </View>
   );
 }
@@ -244,6 +275,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F8F7",
   },
+  absoluteHeader: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: "#FFFFFF",
+  },
   safeArea: {
     backgroundColor: "#FFFFFF",
   },
@@ -252,7 +291,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginHorizontal: 20,
-    marginVertical: 16,
+    marginTop: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#EEEBF1",
   },
@@ -285,7 +324,7 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: "row",
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginVertical: 12,
   },
   tab: {
     flex: 1,

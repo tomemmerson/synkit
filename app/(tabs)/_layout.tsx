@@ -34,7 +34,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="fitness"
+          name="fitness/index"
           options={{
             title: "Fitness",
             tabBarIcon: ({ color, size }) => (

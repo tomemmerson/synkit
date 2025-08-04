@@ -12,6 +12,7 @@ import Subheading from "@/components/Subheading";
 import Paragraph from "@/components/Paragraph";
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import { router } from "expo-router";
 
 export default function Fitness() {
   return (
@@ -39,7 +40,13 @@ export default function Fitness() {
               duration="30 mins"
               exercises={5}
             />
-            <Button title="Start Workout" round />
+            <Button
+              title="Start Workout"
+              round
+              onPress={() => {
+                router.push("/fitness/workout");
+              }}
+            />
           </View>
           <View style={styles.section}>
             <Subheading>Your phase</Subheading>

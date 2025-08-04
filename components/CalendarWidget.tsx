@@ -13,6 +13,7 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/pro-light-svg-icons";
+import { useLogging } from "@/data/logging";
 
 interface CalendarWidgetProps {
   selectedDate: Date;
@@ -36,6 +37,8 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   onClick,
 }) => {
   const todaysDate = new Date();
+
+  const { dayLog } = useLogging();
 
   // Window size - total number of weeks to keep loaded
   const WINDOW_SIZE = 6;
@@ -200,19 +203,6 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
     [weekWidth, generateWeekData, WINDOW_SIZE]
   );
 
-  const getStatusColor = (status: string | null) => {
-    switch (status) {
-      case "active":
-        return "#FF6B6B";
-      case "light":
-        return "#90C695";
-      case "current":
-        return "#614178";
-      default:
-        return "transparent";
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
@@ -296,24 +286,14 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                     {item.date}
                   </Text>
                 </View>
-                {item.status && item.status !== "current" && (
-                  <View style={styles.dotsContainer}>
-                    <View
-                      style={[
-                        styles.dot,
-                        { backgroundColor: getStatusColor(item.status) },
-                      ]}
-                    />
-                    {item.status === "active" && (
-                      <View
-                        style={[
-                          styles.dot,
-                          { backgroundColor: getStatusColor(item.status) },
-                        ]}
-                      />
-                    )}
-                  </View>
-                )}
+                <View style={styles.dotsContainer}>
+                  {dayLog(item.fullDate)?.mood && (
+                    <View style={[styles.dot, { backgroundColor: "blue" }]} />
+                  )}
+                  {dayLog(item.fullDate)?.period && (
+                    <View style={[styles.dot, { backgroundColor: "red" }]} />
+                  )}
+                </View>
               </TouchableOpacity>
             ))}
           </View>

@@ -50,7 +50,7 @@ export default function NameScreen() {
                     What should we call you?
                   </Text>
                   <Text style={styles.description}>
-                    What should we refer to you on the app as.
+                    What should we refer to you as.
                   </Text>
                 </View>
 
@@ -60,7 +60,7 @@ export default function NameScreen() {
                       styles.textInput,
                       isFocused && styles.textInputFocused,
                     ]}
-                    placeholder="Joan Smith"
+                    placeholder="First name"
                     placeholderTextColor="#9294AC"
                     value={name}
                     onChangeText={setName}
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   inputSection: {
-    paddingHorizontal: 20,
     marginBottom: 40,
   },
   textInput: {

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import ActionSheet, {
+  SheetManager,
+  SheetProps,
+} from "react-native-actions-sheet";
 import SelectionScroll, { SelectionOption } from "@/components/SelectionScroll";
 import BaseSheet from "./BaseSheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -10,8 +13,9 @@ import {
   faSadTear,
   faSmile,
 } from "@fortawesome/pro-solid-svg-icons";
+import { Mood, useLogging } from "@/data/logging";
 
-const moodOptions: SelectionOption[] = [
+const moodOptions: (SelectionOption & { id: Mood })[] = [
   {
     id: "happy",
     icon: {
@@ -46,8 +50,17 @@ const moodOptions: SelectionOption[] = [
   },
 ];
 
-function MoodSheet() {
-  const [selectedMood, setSelectedMood] = useState<string>("sad");
+type Props = {
+  selectedDate: Date;
+};
+
+function MoodSheet(props: SheetProps<"mood-sheet">) {
+  const { dayLog, logMood } = useLogging();
+
+  const defaultMood =
+    dayLog(props.payload?.selectedDate || new Date())?.mood || "sad";
+
+  const [selectedMood, setSelectedMood] = useState<string>(defaultMood);
 
   const handleMoodSelect = (moodId: string) => {
     setSelectedMood(moodId);
@@ -56,6 +69,16 @@ function MoodSheet() {
   const handleLogMood = () => {
     // Handle mood logging logic here
     console.log("Selected mood:", selectedMood);
+    console.log("Selected date:", props.payload?.selectedDate);
+
+    if (!props.payload?.selectedDate) {
+      console.error("No date selected for mood logging.");
+      return;
+    }
+
+    logMood(props.payload?.selectedDate, selectedMood as Mood);
+
+    SheetManager.hide("mood-sheet");
   };
 
   return (

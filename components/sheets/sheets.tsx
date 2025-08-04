@@ -9,8 +9,16 @@ registerSheet("period-sheet", PeriodSheet);
 // across the app for all registered sheets.
 declare module "react-native-actions-sheet" {
   interface Sheets {
-    "mood-sheet": SheetDefinition;
-    "period-sheet": SheetDefinition;
+    "mood-sheet": SheetDefinition<{
+      payload: {
+        selectedDate: Date;
+      };
+    }>;
+    "period-sheet": SheetDefinition<{
+      payload: {
+        selectedDate: Date;
+      };
+    }>;
   }
 }
 

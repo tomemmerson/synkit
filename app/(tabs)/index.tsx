@@ -16,6 +16,7 @@ import {
 import { SheetManager } from "react-native-actions-sheet";
 import Heading from "@/components/Heading";
 import Subheading from "@/components/Subheading";
+import { useLogging } from "@/data/logging";
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -54,7 +55,8 @@ export default function HomeScreen() {
 
   const [selectedDate, setSelectedDate] = React.useState(new Date());
 
-  // SheetManager.show("mood-sheet");
+  const { dayLog } = useLogging();
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -130,7 +132,9 @@ export default function HomeScreen() {
                       type="Period"
                       title="Light"
                       subtitle="Day 1"
-                      status="completed"
+                      status={
+                        dayLog(selectedDate)?.period ? "completed" : "add"
+                      }
                       color="#E29A96"
                       onPress={() => SheetManager.show("period-sheet")}
                       icon={faDroplet}
@@ -139,12 +143,16 @@ export default function HomeScreen() {
                   <View style={styles.halfCard}>
                     <StatusCard
                       type="Mood"
-                      title="Happy"
+                      title={dayLog(selectedDate)?.mood || "Not logged"}
                       subtitle="-"
-                      status="add"
+                      status={dayLog(selectedDate)?.mood ? "completed" : "add"}
                       color="#D196E2"
                       onPress={() => {
-                        SheetManager.show("mood-sheet");
+                        SheetManager.show("mood-sheet", {
+                          payload: {
+                            selectedDate,
+                          },
+                        });
                       }}
                       icon={faFaceLaugh}
                     />

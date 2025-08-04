@@ -51,19 +51,19 @@ const workoutData: WorkoutSection[] = [
       },
       {
         id: "3",
-        name: "Hip rotations",
+        name: "Shoulder rolls",
         reps: "10 reps each side",
         icon: "dumbbell",
       },
       {
         id: "4",
-        name: "Hip rotations",
+        name: "Ankle circles",
         reps: "10 reps each side",
         icon: "dumbbell",
       },
       {
         id: "5",
-        name: "Hip rotations",
+        name: "Arm swings",
         reps: "10 reps each side",
         icon: "dumbbell",
       },
@@ -75,19 +75,19 @@ const workoutData: WorkoutSection[] = [
     description: "Main workout routine to build strength and endurance!",
     exercises: [
       {
-        id: "3",
+        id: "6",
         name: "Push-ups",
         reps: "15 reps",
         icon: "dumbbell",
       },
       {
-        id: "4",
+        id: "7",
         name: "Squats",
         reps: "20 reps",
         icon: "dumbbell",
       },
       {
-        id: "5",
+        id: "8",
         name: "Plank",
         reps: "30 seconds",
         icon: "dumbbell",
@@ -100,13 +100,13 @@ const workoutData: WorkoutSection[] = [
     description: "Cool down with relaxing stretches!",
     exercises: [
       {
-        id: "6",
+        id: "9",
         name: "Forward fold",
         reps: "Hold 30 seconds",
         icon: "dumbbell",
       },
       {
-        id: "7",
+        id: "10",
         name: "Child's pose",
         reps: "Hold 30 seconds",
         icon: "dumbbell",
@@ -122,7 +122,6 @@ export default function WorkoutPage() {
   );
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [isScrolling, setIsScrolling] = useState(false);
 
   const activeSection = workoutData.find((section) => section.id === activeTab);
 
@@ -134,6 +133,34 @@ export default function WorkoutPage() {
       } else {
         newSet.add(exerciseId);
       }
+
+      // Check if this completion makes the section complete
+      if (!newSet.has(exerciseId)) {
+        // Exercise was unchecked, no need to check for completion
+        return newSet;
+      }
+
+      // Exercise was just checked - see if section is now complete
+      if (activeSection) {
+        const sectionExerciseIds = activeSection.exercises.map((ex) => ex.id);
+        const allCompleted = sectionExerciseIds.every((id) => newSet.has(id));
+
+        if (allCompleted && sectionExerciseIds.length > 0) {
+          // Find next section
+          const currentIndex = workoutData.findIndex(
+            (section) => section.id === activeTab
+          );
+          const nextSection = workoutData[currentIndex + 1];
+
+          if (nextSection) {
+            // Auto-advance to next section after a short delay
+            setTimeout(() => {
+              setActiveTab(nextSection.id);
+            }, 200);
+          }
+        }
+      }
+
       return newSet;
     });
   };
@@ -147,8 +174,19 @@ export default function WorkoutPage() {
   };
 
   const handleNext = () => {
-    // Handle next action - could navigate to next tab or start workout
-    console.log("Next pressed");
+    const currentIndex = workoutData.findIndex(
+      (section) => section.id === activeTab
+    );
+    const nextSection = workoutData[currentIndex + 1];
+
+    if (nextSection) {
+      // Move to next section
+      setActiveTab(nextSection.id);
+    } else {
+      // All sections complete - could navigate to completion screen
+      console.log("Workout complete!");
+      router.push("/(tabs)/fitness");
+    }
   };
 
   // Animation values for scroll
@@ -239,7 +277,7 @@ export default function WorkoutPage() {
               {
                 translateY: scrollY.interpolate({
                   inputRange: [0, SCROLL_DISTANCE],
-                  outputRange: [0, -20],
+                  outputRange: [0, -16],
                   extrapolate: "clamp",
                 }),
               },
@@ -262,7 +300,24 @@ export default function WorkoutPage() {
             </TouchableOpacity>
 
             <View style={styles.headerCenter}>
-              <Text style={styles.workoutTitle}>Full body workout</Text>
+              <Animated.Text
+                style={[
+                  styles.workoutTitle,
+                  {
+                    transform: [
+                      {
+                        translateY: scrollY.interpolate({
+                          inputRange: [0, SCROLL_DISTANCE],
+                          outputRange: [0, 8],
+                          extrapolate: "clamp",
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                Full body workout
+              </Animated.Text>
               <Animated.Text
                 style={[styles.workoutDuration, { opacity: durationOpacity }]}
               >
@@ -325,6 +380,16 @@ export default function WorkoutPage() {
           )}
         </View>
       </Animated.ScrollView>
+
+      {/* Bottom Button */}
+      {workoutData.findIndex((section) => section.id === activeTab) ===
+        workoutData.length - 1 && (
+        <View
+          style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}
+        >
+          <Button title={"Complete Workout"} onPress={handleNext} />
+        </View>
+      )}
     </View>
   );
 }

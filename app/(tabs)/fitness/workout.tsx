@@ -14,7 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChevronLeft, faTimes } from "@fortawesome/pro-regular-svg-icons";
-import { faDumbbell } from "@fortawesome/pro-solid-svg-icons";
+import { faDumbbell, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import Button from "@/components/Button";
 
 interface Exercise {
@@ -50,19 +50,19 @@ const workoutData: WorkoutSection[] = [
         icon: "dumbbell",
       },
       {
-        id: "2",
+        id: "3",
         name: "Hip rotations",
         reps: "10 reps each side",
         icon: "dumbbell",
       },
       {
-        id: "2",
+        id: "4",
         name: "Hip rotations",
         reps: "10 reps each side",
         icon: "dumbbell",
       },
       {
-        id: "2",
+        id: "5",
         name: "Hip rotations",
         reps: "10 reps each side",
         icon: "dumbbell",
@@ -117,11 +117,26 @@ const workoutData: WorkoutSection[] = [
 
 export default function WorkoutPage() {
   const [activeTab, setActiveTab] = useState("mobility");
+  const [completedExercises, setCompletedExercises] = useState<Set<string>>(
+    new Set()
+  );
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
   const [isScrolling, setIsScrolling] = useState(false);
 
   const activeSection = workoutData.find((section) => section.id === activeTab);
+
+  const toggleExerciseComplete = (exerciseId: string) => {
+    setCompletedExercises((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(exerciseId)) {
+        newSet.delete(exerciseId);
+      } else {
+        newSet.add(exerciseId);
+      }
+      return newSet;
+    });
+  };
 
   const handleBack = () => {
     router.back();
@@ -151,20 +166,64 @@ export default function WorkoutPage() {
     extrapolate: "clamp",
   });
 
-  const renderExerciseItem = (exercise: Exercise, index: number) => (
-    <View key={exercise.id} style={styles.exerciseItem}>
-      <View style={styles.exerciseNumber}>
-        <Text style={styles.exerciseNumberText}>{index + 1}.</Text>
-      </View>
-      <View style={styles.exerciseIcon}>
-        <FontAwesomeIcon icon={faDumbbell} size={24} color="#A184AB" />
-      </View>
-      <View style={styles.exerciseContent}>
-        <Text style={styles.exerciseName}>{exercise.name}</Text>
-        <Text style={styles.exerciseReps}>{exercise.reps}</Text>
-      </View>
-    </View>
-  );
+  const renderExerciseItem = (exercise: Exercise, index: number) => {
+    const isCompleted = completedExercises.has(exercise.id);
+
+    return (
+      <TouchableOpacity
+        key={exercise.id}
+        style={[
+          styles.exerciseItem,
+          isCompleted && styles.exerciseItemCompleted,
+        ]}
+        onPress={() => toggleExerciseComplete(exercise.id)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.exerciseNumber}>
+          <Text
+            style={[
+              styles.exerciseNumberText,
+              isCompleted && styles.exerciseNumberCompleted,
+            ]}
+          >
+            {index + 1}.
+          </Text>
+        </View>
+
+        <View style={styles.exerciseIcon}>
+          <FontAwesomeIcon icon={faDumbbell} size={24} color="#A184AB" />
+        </View>
+
+        <View style={styles.exerciseContent}>
+          <Text
+            style={[
+              styles.exerciseName,
+              isCompleted && styles.exerciseNameCompleted,
+            ]}
+          >
+            {exercise.name}
+          </Text>
+          <Text
+            style={[
+              styles.exerciseReps,
+              isCompleted && styles.exerciseRepsCompleted,
+            ]}
+          >
+            {exercise.reps}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
+          onPress={() => toggleExerciseComplete(exercise.id)}
+        >
+          {isCompleted && (
+            <FontAwesomeIcon icon={faCheck} size={16} color="#FFFFFF" />
+          )}
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -376,6 +435,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#F0EDF1",
   },
+  exerciseItemCompleted: {
+    backgroundColor: "#F8F6F9",
+    borderColor: "#E8E1EB",
+  },
   exerciseNumber: {
     marginRight: 16,
     minWidth: 20,
@@ -384,6 +447,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#A184AB",
+  },
+  exerciseNumberCompleted: {
+    color: "#8A6B92",
+    textDecorationLine: "line-through",
   },
   exerciseIcon: {
     width: 48,
@@ -403,9 +470,31 @@ const styles = StyleSheet.create({
     color: "#614178",
     marginBottom: 4,
   },
+  exerciseNameCompleted: {
+    color: "#8A6B92",
+    textDecorationLine: "line-through",
+  },
   exerciseReps: {
     fontSize: 14,
     color: "#A184AB",
+  },
+  exerciseRepsCompleted: {
+    color: "#8A6B92",
+    textDecorationLine: "line-through",
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#D4C3D8",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  checkboxCompleted: {
+    backgroundColor: "#614178",
+    borderColor: "#614178",
   },
   bottomContainer: {
     paddingHorizontal: 20,

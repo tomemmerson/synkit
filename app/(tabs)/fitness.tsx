@@ -44,7 +44,7 @@ export default function Fitness() {
               title="Start Workout"
               round
               onPress={() => {
-                router.push("/fitness/workout");
+                router.push("/workout");
               }}
             />
           </View>

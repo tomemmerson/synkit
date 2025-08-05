@@ -287,16 +287,14 @@ export default function WorkoutPage() {
       >
         <View
           style={{
-            borderBottomWidth: 1,
-            borderBottomColor: "#EEEBF1",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "#614178",
           }}
         >
           <Animated.View
             style={[styles.titleSection, { paddingBottom: titlePadding }]}
           >
             <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-              <FontAwesomeIcon icon={faChevronLeft} size={20} color="#614178" />
+              <FontAwesomeIcon icon={faChevronLeft} size={20} color="#FFFFFF" />
             </TouchableOpacity>
 
             <View style={styles.headerCenter}>
@@ -326,7 +324,7 @@ export default function WorkoutPage() {
             </View>
 
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-              <FontAwesomeIcon icon={faTimes} size={20} color="#614178" />
+              <FontAwesomeIcon icon={faTimes} size={20} color="#FFFFFF" />
             </TouchableOpacity>
           </Animated.View>
 
@@ -405,7 +403,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#614178",
+    boxShadow: "0px 10px 9px rgba(0, 0, 0, 0.1)",
   },
   safeArea: {
     backgroundColor: "#FFFFFF",
@@ -417,7 +416,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEEBF1",
+    borderBottomColor: "#7B5791",
   },
   backButton: {
     width: 40,
@@ -438,12 +437,12 @@ const styles = StyleSheet.create({
   workoutTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#614178",
+    color: "#FFFFFF",
     marginBottom: 2,
   },
   workoutDuration: {
     fontSize: 14,
-    color: "#A184AB",
+    color: "#E6D9EA",
   },
   tabContainer: {
     flexDirection: "row",
@@ -459,12 +458,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#EFECF0",
+    backgroundColor: "white",
   },
   tabText: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#A184AB",
+    color: "#E6D9EA",
   },
   activeTabText: {
     color: "#614178",

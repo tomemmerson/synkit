@@ -44,22 +44,23 @@ export default function Fitness() {
               A workout picked just for you, based on your cycle phase.{" "}
             </Paragraph>
             {workouts && workouts.length > 0 && (
-              <WorkoutCard
-                title={workouts[0].name}
-                difficulty="Medium"
-                onPress={() => SheetManager.show("workout-sheet")}
-                duration={workouts[0].estimatedDuration || ""}
-                exercises={5}
-              />
+              <>
+                <WorkoutCard
+                  title={workouts[0].name}
+                  difficulty="Medium"
+                  onPress={() => SheetManager.show("workout-sheet")}
+                  duration={workouts[0].estimatedDuration || ""}
+                  exercises={5}
+                />
+                <Button
+                  title="Start Workout"
+                  round
+                  onPress={() => {
+                    router.push("/workout");
+                  }}
+                />
+              </>
             )}
-
-            <Button
-              title="Start Workout"
-              round
-              onPress={() => {
-                router.push("/workout");
-              }}
-            />
           </View>
           <View style={styles.section}>
             <Subheading>Your phase</Subheading>

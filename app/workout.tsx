@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChevronLeft, faTimes } from "@fortawesome/pro-regular-svg-icons";
 import { faDumbbell, faCheck } from "@fortawesome/pro-solid-svg-icons";
@@ -122,6 +122,10 @@ export default function WorkoutPage() {
   );
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  const { workoutID } = useLocalSearchParams<{
+    workoutID?: string;
+  }>();
 
   const activeSection = workoutData.find((section) => section.id === activeTab);
 

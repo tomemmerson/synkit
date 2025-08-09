@@ -210,7 +210,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   levelOptionsSection: {
-    paddingHorizontal: 20,
     gap: 16,
   },
   levelCard: {

@@ -154,7 +154,6 @@ const styles = StyleSheet.create({
   workoutOptionsSection: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
     gap: 16,
   },
   workoutCard: {

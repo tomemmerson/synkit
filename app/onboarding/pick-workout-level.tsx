@@ -34,7 +34,7 @@ export default function PickStrengthLevelScreen() {
     logging.setWorkoutPlan(workoutType);
     logging.setWorkoutLevel(selectedLevel);
 
-    router.push("/(tabs)");
+    router.push("/onboarding/last-period");
   };
 
   return (

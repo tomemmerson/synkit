@@ -39,6 +39,13 @@ export default function StackLayout() {
         }}
       />
       <Stack.Screen
+        name="last-period"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
         name="pick-workout-level"
         options={{
           headerShown: false,

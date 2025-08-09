@@ -126,10 +126,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   title: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "700",
     color: "#FFFFFF",
     marginBottom: 4,
+    textTransform: "capitalize",
   },
   subtitle: {
     fontSize: 16,

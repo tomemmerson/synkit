@@ -45,9 +45,9 @@ export interface SettingsActions {
   getCurrentPlan: () => WorkoutPlan | undefined;
   setName: (name: string) => void;
   setInitialPeriodDate: (date: Date) => void;
-  calculateCurrentPhase: () => PhaseType | undefined;
+  calculateCurrentPhase: (date?: Date) => PhaseType | undefined;
   getLastPeriodStartDate: () => Date | undefined;
-  getPeriodDay: () => number | undefined;
+  getPeriodDay: (date?: Date) => number | undefined;
   getCurrentWorkouts: () => Workout[] | undefined;
 }
 
@@ -196,27 +196,27 @@ export const useLogging = create<
         // Otherwise, fall back to the initial date
         return new Date(initDate);
       },
-      getPeriodDay: () => {
+      getPeriodDay: (selectedDate?: Date) => {
         const lastPeriodStart = get().getLastPeriodStartDate();
 
         if (!lastPeriodStart) {
           return undefined;
         }
 
-        const today = new Date();
+        const today = selectedDate || new Date();
         const diffTime = today.getTime() - lastPeriodStart.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
         return diffDays; // Returns the number of days since the last period started
       },
-      calculateCurrentPhase: () => {
+      calculateCurrentPhase: (selectedDate?: Date) => {
         const lastPeriodStart = get().getLastPeriodStartDate();
 
         if (!lastPeriodStart) {
           return undefined; // We don't have a last period date
         }
 
-        const today = new Date();
+        const today = selectedDate || new Date();
         const diffTime = today.getTime() - lastPeriodStart.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 

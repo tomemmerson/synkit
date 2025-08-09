@@ -23,7 +23,7 @@ export interface SelectionOption {
 
 interface SelectionScrollProps {
   options: SelectionOption[];
-  selectedId: string;
+  selectedId?: string;
   onSelect: (id: string) => void;
   style?: any;
   title?: string;

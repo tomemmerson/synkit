@@ -13,7 +13,6 @@ export default function PickStrengthLevelScreen() {
   const { workoutType } = useLocalSearchParams<{
     workoutType?: WorkoutPlanType;
   }>();
-  const [selectedLevel, setSelectedLevel] = useState("intermediate");
 
   const logging = useLogging();
 
@@ -29,10 +28,10 @@ export default function PickStrengthLevelScreen() {
       return <Text>No workout plans available.</Text>;
   }
 
-  const handleNext = () => {
+  const handleNext = (workoutLevel: string) => {
     // Navigation logic will go here
     logging.setWorkoutPlan(workoutType);
-    logging.setWorkoutLevel(selectedLevel);
+    logging.setWorkoutLevel(workoutLevel);
 
     router.push("/onboarding/last-period");
   };
@@ -63,11 +62,8 @@ export default function PickStrengthLevelScreen() {
               {Object.entries(workoutPlans).map(([key, plan]) => (
                 <TouchableOpacity
                   key={key}
-                  style={[
-                    styles.levelCard,
-                    selectedLevel === key && styles.levelCardSelected,
-                  ]}
-                  onPress={() => setSelectedLevel(key)}
+                  style={[styles.levelCard]}
+                  onPress={() => handleNext(key)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.levelImageContainer}>
@@ -78,14 +74,7 @@ export default function PickStrengthLevelScreen() {
                     />
                   </View>
                   <View style={styles.levelTextContainer}>
-                    <Text
-                      style={[
-                        styles.levelTitle,
-                        selectedLevel === key && styles.levelTitleSelected,
-                      ]}
-                    >
-                      {plan.name}
-                    </Text>
+                    <Text style={[styles.levelTitle]}>{plan.name}</Text>
                     <Text style={styles.levelDescription}>
                       {plan.requirements}
                     </Text>
@@ -93,10 +82,6 @@ export default function PickStrengthLevelScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
-
-          <View style={styles.bottomSection}>
-            <Button title="Next" onPress={handleNext} />
           </View>
         </View>
       </SafeAreaView>

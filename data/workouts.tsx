@@ -6,15 +6,19 @@ type Exercise = {
   icon: string;
 };
 
-type Workout = {
+export type Workout = {
   day: number;
   name: string;
+  estimatedDuration?: string;
+  difficulty: "Medium" | "High" | "Low";
   exercises: Exercise[];
 };
 
 type Phase = {
   workouts: Workout[];
 };
+
+export type PhaseType = "menstrual" | "follicular" | "ovulation" | "luteal";
 
 export type WorkoutPlanType = "running" | "strength";
 
@@ -56,6 +60,7 @@ export const runPlans: Plan = {
                 icon: "TODO",
               },
             ],
+            estimatedDuration: "30 mins",
           },
           {
             day: 2,
@@ -67,6 +72,7 @@ export const runPlans: Plan = {
                 icon: "TODO",
               },
             ],
+            estimatedDuration: "20 mins",
           },
           {
             day: 3,

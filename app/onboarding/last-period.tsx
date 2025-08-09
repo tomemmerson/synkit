@@ -20,81 +20,73 @@ import { useLogging } from "@/data/logging";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function LastPeriodScreen() {
-  const [lastPeriodDate, setLastPeriodDate] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+  const [lastPeriodDate, setLastPeriodDate] = useState<Date | undefined>(
+    undefined
+  );
   const logging = useLogging();
 
   const handleNext = () => {
     // Save the last period date and navigate
     // You might want to parse and validate the date here
-    // router.push("/(tabs)");
+    if (!lastPeriodDate) {
+      return;
+    }
+
+    logging.setInitialPeriodDate(new Date(lastPeriodDate));
+    router.push("/(tabs)");
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.background}>
-          <StatusBar style="dark" />
-          <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-              <View style={styles.header}>
-                <Image
-                  source={require("../../assets/images/logo-full.png")}
-                  style={styles.logo}
-                  resizeMode="contain"
-                />
-              </View>
-              <View style={styles.topSection}>
-                <View style={styles.textSection}>
-                  <Text style={styles.welcomeTitle}>
-                    When did your last period start?
-                  </Text>
-                  <Text style={styles.description}>
-                    We use period tracking to show workouts based on your cycle.
-                  </Text>
-                </View>
-
-                <View style={styles.inputSection}>
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    value={new Date()}
-                    mode={"date"}
-                    display="default"
-                    // textColor="#2B2E46"
-                    // accentColor="#6B46C1"
-                    themeVariant="light"
-                    onChange={() => {}}
-                  />
-                  {/* <TextInput
-                    style={[
-                      styles.textInput,
-                      isFocused && styles.textInputFocused,
-                    ]}
-                    placeholder="22/04/25"
-                    placeholderTextColor="#9294AC"
-                    value={lastPeriodDate}
-                    onChangeText={setLastPeriodDate}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    keyboardType="numeric"
-                  /> */}
-                </View>
-              </View>
-
-              <View style={styles.bottomSection}>
-                <Button title="Next" onPress={handleNext} />
-              </View>
+    <View style={styles.background}>
+      <StatusBar style="dark" />
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Image
+              source={require("../../assets/images/logo-full.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={styles.topSection}>
+            <View style={styles.textSection}>
+              <Text style={styles.welcomeTitle}>
+                When did your last period start?
+              </Text>
+              <Text style={styles.description}>
+                We use period tracking to show workouts based on your cycle.
+              </Text>
             </View>
-          </SafeAreaView>
+
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Period start date</Text>
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={lastPeriodDate || new Date()}
+                mode={"date"}
+                display="default"
+                // textColor="#2B2E46"
+                // accentColor="#6B46C1"
+                themeVariant="light"
+                onChange={(event, date) => {
+                  if (date) {
+                    setLastPeriodDate(date);
+                  }
+                }}
+              />
+            </View>
+          </View>
+
+          <View style={styles.bottomSection}>
+            <Button
+              title="Next"
+              onPress={handleNext}
+              disabled={!lastPeriodDate}
+            />
+          </View>
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -103,7 +95,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F2F1",
   },
   container: {
-    // paddingHorizontal: 16,
     justifyContent: "space-between",
     display: "flex",
     height: "100%",
@@ -124,7 +115,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    justifyContent: "center",
+    // justifyContent: "center",
     paddingHorizontal: 20,
   },
   textSection: {
@@ -149,17 +140,15 @@ const styles = StyleSheet.create({
   inputSection: {
     marginBottom: 40,
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-end",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  textInput: {
-    borderWidth: 2,
-    borderColor: "transparent",
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
+  inputLabel: {
     fontSize: 16,
     color: "#2B2E46",
-    backgroundColor: "#FFFFFF",
+    fontWeight: "500",
+    marginBottom: 8,
   },
   textInputFocused: {
     borderColor: "#6B46C1",

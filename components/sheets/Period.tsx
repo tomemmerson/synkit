@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
+import ActionSheet, {
+  SheetManager,
+  SheetProps,
+} from "react-native-actions-sheet";
 import SelectionScroll, { SelectionOption } from "@/components/SelectionScroll";
 import BaseSheet from "./BaseSheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -11,8 +14,13 @@ import {
   faSadTear,
   faSmile,
 } from "@fortawesome/pro-solid-svg-icons";
+import { Flow, useLogging } from "@/data/logging";
 
-const periodOptions: SelectionOption[] = [
+interface Options extends SelectionOption {
+  id: Flow;
+}
+
+const periodOptions: Options[] = [
   {
     id: "light",
     icon: {
@@ -51,16 +59,25 @@ const periodOptions: SelectionOption[] = [
   },
 ];
 
-function PeriodSheet() {
-  const [selectedPeriod, setSelectedPeriod] = useState<string>("medium");
+function PeriodSheet(props: SheetProps<"mood-sheet">) {
+  const [selectedPeriod, setSelectedPeriod] = useState<Flow | undefined>(
+    undefined
+  );
 
-  const handlePeriodSelect = (periodId: string) => {
+  const logging = useLogging();
+
+  const handlePeriodSelect = (periodId: any) => {
     setSelectedPeriod(periodId);
   };
 
   const handleLogPeriod = () => {
-    // Handle period logging logic here
-    console.log("Selected period:", selectedPeriod);
+    if (!props.payload?.selectedDate) {
+      console.error("No date selected for mood logging.");
+      return;
+    }
+
+    logging.logPeriod(props.payload.selectedDate, selectedPeriod);
+    SheetManager.hide("period-sheet");
   };
 
   return (

@@ -6,11 +6,10 @@ import Typography from "@/components/Typography";
 import Button from "@/components/Button";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { WorkoutPlanType } from "@/data/workouts";
 
 export default function PickWorkoutScreen() {
-  const [selectedWorkout, setSelectedWorkout] = useState("strength");
-
-  const handleNext = () => {
+  const handleNext = (selectedWorkout: WorkoutPlanType) => {
     // Navigation logic will go here
     router.push({
       pathname: "/onboarding/pick-workout-level",
@@ -44,11 +43,8 @@ export default function PickWorkoutScreen() {
 
             <View style={styles.workoutOptionsSection}>
               <TouchableOpacity
-                style={[
-                  styles.workoutCard,
-                  selectedWorkout === "running" && styles.workoutCardSelected,
-                ]}
-                onPress={() => setSelectedWorkout("running")}
+                style={[styles.workoutCard]}
+                onPress={() => handleNext("running")}
               >
                 <View style={styles.workoutImageContainer}>
                   <Image
@@ -57,23 +53,12 @@ export default function PickWorkoutScreen() {
                     resizeMode="contain"
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.workoutTitle,
-                    selectedWorkout === "running" &&
-                      styles.workoutTitleSelected,
-                  ]}
-                >
-                  Running
-                </Text>
+                <Text style={[styles.workoutTitle]}>Running</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.workoutCard,
-                  selectedWorkout === "strength" && styles.workoutCardSelected,
-                ]}
-                onPress={() => setSelectedWorkout("strength")}
+                style={[styles.workoutCard]}
+                onPress={() => handleNext("strength")}
               >
                 <View style={styles.workoutImageContainer}>
                   <Image
@@ -82,21 +67,9 @@ export default function PickWorkoutScreen() {
                     resizeMode="contain"
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.workoutTitle,
-                    selectedWorkout === "strength" &&
-                      styles.workoutTitleSelected,
-                  ]}
-                >
-                  Strength
-                </Text>
+                <Text style={[styles.workoutTitle]}>Strength</Text>
               </TouchableOpacity>
             </View>
-          </View>
-
-          <View style={styles.bottomSection}>
-            <Button title="Next" onPress={handleNext} />
           </View>
         </View>
       </SafeAreaView>

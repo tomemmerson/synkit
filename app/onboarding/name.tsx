@@ -25,6 +25,10 @@ export default function NameScreen() {
 
   const handleGetStarted = () => {
     // Navigation logic will go here
+    if (!name.trim()) {
+      return; // Optionally handle empty name case
+    }
+
     logging.setName(name);
     router.push("/onboarding/pick-workout");
   };
@@ -76,7 +80,11 @@ export default function NameScreen() {
               </View>
 
               <View style={styles.bottomSection}>
-                <Button title="Get Started" onPress={handleGetStarted} />
+                <Button
+                  title="Get Started"
+                  onPress={handleGetStarted}
+                  disabled={!name.trim()}
+                />
               </View>
             </View>
           </SafeAreaView>

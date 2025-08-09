@@ -21,10 +21,10 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <Pressable
       style={[
-        disabled && styles.disabledButton,
         styles[variant],
         style,
         round && { borderRadius: 50 },
+        disabled && styles.disabledButton,
       ]}
       onPress={!disabled ? onPress : undefined}
     >

@@ -14,9 +14,16 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { router } from "expo-router";
 import { useLogging } from "@/data/logging";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faRunning, faTimer } from "@fortawesome/pro-regular-svg-icons";
+import { faSpinnerScale } from "@fortawesome/pro-solid-svg-icons";
 
 export default function Fitness() {
   const logging = useLogging();
+
+  console.log("Current phase:", logging.calculateCurrentPhase());
+
+  const workouts = logging.getCurrentWorkouts();
 
   return (
     <View style={styles.container}>
@@ -36,13 +43,16 @@ export default function Fitness() {
             <Paragraph style={{ marginBottom: 16 }}>
               A workout picked just for you, based on your cycle phase.{" "}
             </Paragraph>
-            <WorkoutCard
-              title="Low Impact Workout"
-              difficulty="Medium"
-              onPress={() => SheetManager.show("workout-sheet")}
-              duration="30 mins"
-              exercises={5}
-            />
+            {workouts && workouts.length > 0 && (
+              <WorkoutCard
+                title={workouts[0].name}
+                difficulty="Medium"
+                onPress={() => SheetManager.show("workout-sheet")}
+                duration={workouts[0].estimatedDuration || ""}
+                exercises={5}
+              />
+            )}
+
             <Button
               title="Start Workout"
               round
@@ -53,7 +63,31 @@ export default function Fitness() {
           </View>
           <View style={styles.section}>
             <Subheading>Your phase</Subheading>
-            <Card></Card>
+            <Card style={styles.phases}>
+              <View style={styles.phaseItem}>
+                <FontAwesomeIcon icon={faTimer} size={17} color="#6153F5" />
+                <Subheading style={styles.phaseItemText}>
+                  {logging.calculateCurrentPhase()}
+                </Subheading>
+                <Text style={styles.phaseItemLabel}>phase</Text>
+              </View>
+              <View style={styles.phaseItem}>
+                <FontAwesomeIcon
+                  icon={faSpinnerScale}
+                  size={17}
+                  color="#6153F5"
+                />
+                <Subheading style={styles.phaseItemText}>
+                  {logging.getPeriodDay()}
+                </Subheading>
+                <Text style={styles.phaseItemLabel}>Day</Text>
+              </View>
+              <View style={styles.phaseItem}>
+                <FontAwesomeIcon icon={faRunning} size={17} color="#6153F5" />
+                <Subheading style={styles.phaseItemText}>High</Subheading>
+                <Text style={styles.phaseItemLabel}>Energy level</Text>
+              </View>
+            </Card>
           </View>
           <View style={styles.section}>
             <Subheading>Workout plan</Subheading>
@@ -110,5 +144,27 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 50,
     paddingHorizontal: 16,
+  },
+  phases: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  phaseItem: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  phaseItemText: {
+    marginTop: 10,
+    marginBottom: 0,
+    textTransform: "capitalize",
+  },
+  phaseItemLabel: {
+    fontSize: 16,
+    color: "#A184AB",
   },
 });

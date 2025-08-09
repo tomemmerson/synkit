@@ -136,7 +136,13 @@ export default function HomeScreen() {
                         dayLog(selectedDate)?.period ? "completed" : "add"
                       }
                       color="#E29A96"
-                      onPress={() => SheetManager.show("period-sheet")}
+                      onPress={() =>
+                        SheetManager.show("period-sheet", {
+                          payload: {
+                            selectedDate,
+                          },
+                        })
+                      }
                       icon={faDroplet}
                     />
                   </View>

@@ -1,3 +1,5 @@
+import { ImageSourcePropType } from "react-native";
+
 type Exercise = {
   name: string;
   description: string;
@@ -14,8 +16,15 @@ type Phase = {
   workouts: Workout[];
 };
 
-type WorkoutPlan = {
+export type WorkoutPlanType = "running" | "strength";
+
+export type WorkoutLevel = keyof typeof runPlans | keyof typeof strengthPlans;
+
+export type WorkoutPlan = {
   name: string;
+  level: string;
+  requirements: string;
+  icon: ImageSourcePropType;
   phases: {
     menstrual: Phase;
     follicular: Phase;
@@ -28,9 +37,12 @@ type WorkoutPlan = {
 
 type Plan = Record<string, WorkoutPlan>;
 
-const runPlans: Plan = {
+export const runPlans: Plan = {
   beginner: {
-    name: "Beginner",
+    name: "Running Beginner",
+    level: "Beginner",
+    requirements: "No previous running experience required",
+    icon: require("@/assets/images/strength/strength-small.png"),
     phases: {
       menstrual: {
         workouts: [
@@ -370,7 +382,10 @@ const runPlans: Plan = {
     },
   },
   intermediateBeginner: {
-    name: "Intermediate Beginner",
+    name: "Running Intermediate Beginner",
+    level: "Intermediate Beginner",
+    requirements: "Some previous running experience recommended",
+    icon: require("@/assets/images/strength/strength-small.png"),
     phases: {
       menstrual: {
         workouts: [
@@ -721,4 +736,4 @@ const runPlans: Plan = {
   },
 };
 
-const strengthPlans: Plan = {};
+export const strengthPlans: Plan = {};

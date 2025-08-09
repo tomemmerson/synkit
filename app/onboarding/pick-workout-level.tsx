@@ -4,14 +4,36 @@ import { StatusBar } from "expo-status-bar";
 // import { useSettings } from "@/data/settings";
 import Typography from "@/components/Typography";
 import Button from "@/components/Button";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { runPlans, strengthPlans, WorkoutPlanType } from "@/data/workouts";
+import { useLogging } from "@/data/logging";
 
 export default function PickStrengthLevelScreen() {
+  const { workoutType } = useLocalSearchParams<{
+    workoutType?: WorkoutPlanType;
+  }>();
   const [selectedLevel, setSelectedLevel] = useState("intermediate");
+
+  const logging = useLogging();
+
+  let workoutPlans;
+  switch (workoutType) {
+    case "running":
+      workoutPlans = runPlans;
+      break;
+    case "strength":
+      workoutPlans = strengthPlans;
+      break;
+    default:
+      return <Text>No workout plans available.</Text>;
+  }
 
   const handleNext = () => {
     // Navigation logic will go here
+    logging.setWorkoutPlan(workoutType);
+    logging.setWorkoutLevel(selectedLevel);
+
     router.push("/(tabs)");
   };
 
@@ -38,118 +60,38 @@ export default function PickStrengthLevelScreen() {
             </View>
 
             <View style={styles.levelOptionsSection}>
-              <TouchableOpacity
-                style={[
-                  styles.levelCard,
-                  selectedLevel === "beginner" && styles.levelCardSelected,
-                ]}
-                onPress={() => setSelectedLevel("beginner")}
-              >
-                <View style={styles.levelImageContainer}>
-                  <Image
-                    source={require("../../assets/images/strength/strength-small.png")}
-                    style={styles.levelImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <View style={styles.levelTextContainer}>
-                  <Text
-                    style={[
-                      styles.levelTitle,
-                      selectedLevel === "beginner" && styles.levelTitleSelected,
-                    ]}
-                  >
-                    Strength
-                  </Text>
-                  <Text
-                    style={[
-                      styles.levelSubtitle,
-                      selectedLevel === "beginner" &&
-                        styles.levelSubtitleSelected,
-                    ]}
-                  >
-                    Beginner
-                  </Text>
-                  <Text style={styles.levelDescription}>Never run before</Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.levelCard,
-                  selectedLevel === "intermediate" && styles.levelCardSelected,
-                ]}
-                onPress={() => setSelectedLevel("intermediate")}
-              >
-                <View style={styles.levelImageContainer}>
-                  <Image
-                    source={require("../../assets/images/strength/strength-medium.png")}
-                    style={styles.levelImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <View style={styles.levelTextContainer}>
-                  <Text
-                    style={[
-                      styles.levelTitle,
-                      selectedLevel === "intermediate" &&
-                        styles.levelTitleSelected,
-                    ]}
-                  >
-                    Strength
-                  </Text>
-                  <Text
-                    style={[
-                      styles.levelSubtitle,
-                      selectedLevel === "intermediate" &&
-                        styles.levelSubtitleSelected,
-                    ]}
-                  >
-                    Intermediate
-                  </Text>
-                  <Text style={styles.levelDescription}>
-                    Could easily run a 3k
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.levelCard,
-                  selectedLevel === "advanced" && styles.levelCardSelected,
-                ]}
-                onPress={() => setSelectedLevel("advanced")}
-              >
-                <View style={styles.levelImageContainer}>
-                  <Image
-                    source={require("../../assets/images/strength/strength-large.png")}
-                    style={styles.levelImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <View style={styles.levelTextContainer}>
-                  <Text
-                    style={[
-                      styles.levelTitle,
-                      selectedLevel === "advanced" && styles.levelTitleSelected,
-                    ]}
-                  >
-                    Strength
-                  </Text>
-                  <Text
-                    style={[
-                      styles.levelSubtitle,
-                      selectedLevel === "advanced" &&
-                        styles.levelSubtitleSelected,
-                    ]}
-                  >
-                    Advanced
-                  </Text>
-                  <Text style={styles.levelDescription}>
-                    Could easily run 10k
-                  </Text>
-                </View>
-              </TouchableOpacity>
+              {Object.entries(workoutPlans).map(([key, plan]) => (
+                <TouchableOpacity
+                  key={key}
+                  style={[
+                    styles.levelCard,
+                    selectedLevel === key && styles.levelCardSelected,
+                  ]}
+                  onPress={() => setSelectedLevel(key)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.levelImageContainer}>
+                    <Image
+                      source={plan.icon}
+                      style={styles.levelImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <View style={styles.levelTextContainer}>
+                    <Text
+                      style={[
+                        styles.levelTitle,
+                        selectedLevel === key && styles.levelTitleSelected,
+                      ]}
+                    >
+                      {plan.name}
+                    </Text>
+                    <Text style={styles.levelDescription}>
+                      {plan.requirements}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
@@ -236,8 +178,8 @@ const styles = StyleSheet.create({
   },
   levelTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#2B2E46",
+    fontWeight: "700",
+    color: "#5F2E71",
     marginBottom: 2,
   },
   levelTitleSelected: {

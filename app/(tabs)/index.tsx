@@ -55,7 +55,7 @@ export default function HomeScreen() {
 
   const [selectedDate, setSelectedDate] = React.useState(new Date());
 
-  const { dayLog } = useLogging();
+  const { dayLog, name } = useLogging();
 
   return (
     <View style={styles.container}>
@@ -88,7 +88,7 @@ export default function HomeScreen() {
           {/* Animated Header */}
           <Animated.View style={[styles.header, { opacity: headerOpacity }]}>
             <Heading style={styles.greeting}>{getGreeting()}</Heading>
-            <Text style={styles.username}>Molly!</Text>
+            <Text style={styles.username}>{name}!</Text>
           </Animated.View>
           {/* Header with Calendar */}
           <CalendarWidget

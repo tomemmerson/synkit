@@ -16,13 +16,16 @@ import Typography from "@/components/Typography";
 import Button from "@/components/Button";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLogging } from "@/data/logging";
 
 export default function NameScreen() {
   const [name, setName] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const logging = useLogging();
 
   const handleGetStarted = () => {
     // Navigation logic will go here
+    logging.setName(name);
     router.push("/onboarding/pick-workout");
   };
 

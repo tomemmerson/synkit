@@ -1,6 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import {
+  WorkoutPlanType,
+  WorkoutLevel,
+  runPlans,
+  strengthPlans,
+  WorkoutPlan,
+} from "./workouts";
 
 export type Flow = "light" | "medium" | "heavy" | "very-heavy";
 
@@ -31,16 +38,43 @@ export interface SettingsActions {
   logPeriod: (day: Date, period: string) => void;
   logMood: (day: Date, mood: string) => void;
   dayLog: (day: Date) => LogDays[string] | undefined;
+  setWorkoutPlan: (plan: WorkoutPlanType) => void;
+  setWorkoutLevel: (level: string) => void;
+  getCurrentPlan: () => WorkoutPlan | undefined;
+  setName: (name: string) => void;
 }
 
 export const useLogging = create<
   {
     days: LogDays;
+    currentWorkoutPlan?: WorkoutPlanType;
+    currentWorkoutLevel?: WorkoutLevel;
+    name: string;
   } & SettingsActions
 >()(
   persist(
     (set, get) => ({
       days: {},
+      currentWorkoutPlan: undefined,
+      currentWorkoutLevel: undefined,
+      name: "",
+      getCurrentPlan: () => {
+        let plan = get().currentWorkoutPlan;
+        let level = get().currentWorkoutLevel;
+
+        if (!plan || !level) {
+          return undefined;
+        }
+
+        if (plan === "running") {
+          return runPlans[level];
+        }
+        if (plan === "strength") {
+          return strengthPlans[level];
+        }
+
+        return undefined;
+      },
       logPeriod: (day, period) => {
         set((state) => {
           const dateKey = dateToString(day);
@@ -75,6 +109,15 @@ export const useLogging = create<
       dayLog: (day) => {
         const dateKey = dateToString(day);
         return get().days[dateKey];
+      },
+      setWorkoutPlan: (plan) => {
+        set({ currentWorkoutPlan: plan });
+      },
+      setWorkoutLevel: (level) => {
+        set({ currentWorkoutLevel: level as WorkoutLevel });
+      },
+      setName: (name) => {
+        set({ name });
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

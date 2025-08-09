@@ -39,7 +39,7 @@ export default function StackLayout() {
         }}
       />
       <Stack.Screen
-        name="pick-strength-level"
+        name="pick-workout-level"
         options={{
           headerShown: false,
           headerTransparent: true,

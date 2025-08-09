@@ -13,7 +13,7 @@ export default function PickWorkoutScreen() {
   const handleNext = () => {
     // Navigation logic will go here
     router.push({
-      pathname: "/(tabs)",
+      pathname: "/onboarding/pick-workout-level",
       params: { workoutType: selectedWorkout },
     });
   };

@@ -13,8 +13,11 @@ import Paragraph from "@/components/Paragraph";
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { router } from "expo-router";
+import { useLogging } from "@/data/logging";
 
 export default function Fitness() {
+  const logging = useLogging();
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -70,10 +73,11 @@ export default function Fitness() {
                 }}
               >
                 <Subheading style={{ marginBottom: 0 }}>
-                  Strength beginner
+                  {logging.getCurrentPlan()?.name}
                 </Subheading>
                 <Paragraph>Workout plan</Paragraph>
               </View>
+
               <Button title="Change" variant="secondary" />
             </Card>
           </View>

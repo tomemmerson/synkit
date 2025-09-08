@@ -105,9 +105,11 @@ export default function Fitness() {
                   display: "flex",
                   justifyContent: "center",
                   flexDirection: "column",
+                  flex: 1,
+                  marginRight: 12,
                 }}
               >
-                <Subheading style={{ marginBottom: 0 }}>
+                <Subheading style={{ marginBottom: 0, flexWrap: "wrap" }}>
                   {logging.getCurrentPlan()?.name}
                 </Subheading>
                 <Paragraph>Workout plan</Paragraph>

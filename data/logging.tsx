@@ -22,6 +22,18 @@ export type Symptoms =
 
 export type Mood = "happy" | "sad" | "neutral" | "angry" | "overwhelmed";
 
+export type WorkoutCompletion = {
+  workoutId: string;
+  workoutName: string;
+  planType: WorkoutPlanType;
+  planLevel: WorkoutLevel;
+  phase: PhaseType;
+  completedAt: string; // ISO timestamp
+  duration?: number; // minutes
+  exercisesCompleted: number;
+  totalExercises: number;
+};
+
 export interface LogDays {
   [date: string]: {
     period?: {
@@ -29,6 +41,7 @@ export interface LogDays {
       symptoms: Symptoms[];
     };
     mood?: Mood;
+    workouts?: WorkoutCompletion[];
   };
 }
 
@@ -48,7 +61,23 @@ export interface SettingsActions {
   calculateCurrentPhase: (date?: Date) => PhaseType | undefined;
   getLastPeriodStartDate: () => Date | undefined;
   getPeriodDay: (date?: Date) => number | undefined;
-  getCurrentWorkouts: () => Workout[] | undefined;
+  getCurrentWorkouts: (hideCompleted?: boolean) => Workout[] | undefined;
+  logWorkoutCompletion: (
+    day: Date,
+    workoutId: string,
+    workoutName: string,
+    exercisesCompleted: number,
+    totalExercises: number,
+    duration?: number
+  ) => void;
+  getWorkoutCompletions: (day?: Date) => WorkoutCompletion[];
+  getWorkoutHistory: (days?: number) => WorkoutCompletion[];
+  hasCompletedWorkout: (day?: Date) => boolean;
+  workoutsCompletedInPhase: (
+    planType: WorkoutPlanType,
+    planLevel: WorkoutLevel,
+    phase: PhaseType
+  ) => WorkoutCompletion[];
 }
 
 export const useLogging = create<
@@ -129,7 +158,7 @@ export const useLogging = create<
         set({ name });
       },
       setInitialPeriodDate: (date: Date) => {
-        set({ initialPeriodDate: date });
+        set({ initialPeriodDate: dateToString(date) });
       },
       getLastPeriodStartDate: () => {
         const { initialPeriodDate, days } = get();
@@ -225,7 +254,7 @@ export const useLogging = create<
         if (diffDays < 20) return "ovulation"; // Days 14-19
         return "luteal"; // Days 20 and onwards
       },
-      getCurrentWorkouts: () => {
+      getCurrentWorkouts: (hideCompleted?: boolean) => {
         const plan = get().getCurrentPlan();
         if (!plan) return undefined;
 
@@ -233,7 +262,144 @@ export const useLogging = create<
         if (!phase) return undefined;
 
         const section = plan.phases[phase]?.workouts;
-        return section ? section : undefined;
+        if (!section) return undefined;
+
+        // If hideCompleted is false or undefined, return all workouts
+        if (!hideCompleted) {
+          return section;
+        }
+
+        // If hideCompleted is true, filter out completed workouts
+        const currentPlan = get().currentWorkoutPlan;
+        const currentLevel = get().currentWorkoutLevel;
+
+        if (!currentPlan || !currentLevel) {
+          return section; // Return all if we can't determine plan/level
+        }
+
+        // Get completed workouts for this plan, level, and phase
+        const completedWorkouts = get().workoutsCompletedInPhase(
+          currentPlan,
+          currentLevel,
+          phase
+        );
+
+        // Create a set of completed workout IDs for efficient lookup
+        const completedWorkoutIds = new Set(
+          completedWorkouts.map((completion) => completion.workoutId)
+        );
+
+        // Filter out workouts that have been completed
+        const incompleteWorkouts = section.filter((workout) => {
+          const workoutId = workout.name.toLowerCase().replace(/\s+/g, "-");
+          return !completedWorkoutIds.has(workoutId);
+        });
+
+        return incompleteWorkouts;
+      },
+      logWorkoutCompletion: (
+        day: Date,
+        workoutId: string,
+        workoutName: string,
+        exercisesCompleted: number,
+        totalExercises: number,
+        duration?: number
+      ) => {
+        const currentPlan = get().currentWorkoutPlan;
+        const currentLevel = get().currentWorkoutLevel;
+        const currentPhase = get().calculateCurrentPhase(day);
+
+        if (!currentPlan || !currentLevel || !currentPhase) {
+          console.warn(
+            "Cannot log workout completion: missing plan/level/phase information"
+          );
+          return;
+        }
+
+        const completion: WorkoutCompletion = {
+          workoutId,
+          workoutName,
+          planType: currentPlan,
+          planLevel: currentLevel,
+          phase: currentPhase,
+          completedAt: new Date().toISOString(),
+          duration,
+          exercisesCompleted,
+          totalExercises,
+        };
+
+        set((state) => {
+          const dateKey = dateToString(day);
+          const existingWorkouts = state.days[dateKey]?.workouts || [];
+
+          return {
+            days: {
+              ...state.days,
+              [dateKey]: {
+                ...state.days[dateKey],
+                workouts: [...existingWorkouts, completion],
+              },
+            },
+          };
+        });
+      },
+      getWorkoutCompletions: (day?: Date) => {
+        const targetDay = day || new Date();
+        const dateKey = dateToString(targetDay);
+        return get().days[dateKey]?.workouts || [];
+      },
+      getWorkoutHistory: (days: number = 30) => {
+        const { days: logDays } = get();
+        const today = new Date();
+        const history: WorkoutCompletion[] = [];
+
+        for (let i = 0; i < days; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          const dateKey = dateToString(date);
+          const dayWorkouts = logDays[dateKey]?.workouts || [];
+          history.push(...dayWorkouts);
+        }
+
+        return history.sort(
+          (a, b) =>
+            new Date(b.completedAt).getTime() -
+            new Date(a.completedAt).getTime()
+        );
+      },
+      hasCompletedWorkout: (day?: Date) => {
+        const targetDay = day || new Date();
+        const workouts = get().getWorkoutCompletions(targetDay);
+        return workouts.length > 0;
+      },
+      workoutsCompletedInPhase: (
+        planType: WorkoutPlanType,
+        planLevel: WorkoutLevel,
+        phase: PhaseType
+      ) => {
+        const { days: logDays } = get();
+        const completions: WorkoutCompletion[] = [];
+
+        // Iterate through all logged days
+        Object.values(logDays).forEach((dayLog) => {
+          if (dayLog.workouts) {
+            // Filter workouts that match the specified plan, level, and phase
+            const matchingWorkouts = dayLog.workouts.filter(
+              (workout) =>
+                workout.planType === planType &&
+                workout.planLevel === planLevel &&
+                workout.phase === phase
+            );
+            completions.push(...matchingWorkouts);
+          }
+        });
+
+        // Sort by completion time (most recent first)
+        return completions.sort(
+          (a, b) =>
+            new Date(b.completedAt).getTime() -
+            new Date(a.completedAt).getTime()
+        );
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

@@ -23,7 +23,7 @@ export default function Fitness() {
 
   console.log("Current phase:", logging.calculateCurrentPhase());
 
-  const workouts = logging.getCurrentWorkouts();
+  const workouts = logging.getCurrentWorkouts(true);
 
   return (
     <View style={styles.container}>

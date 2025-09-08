@@ -16,104 +16,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChevronLeft, faTimes } from "@fortawesome/pro-regular-svg-icons";
 import { faDumbbell, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import Button from "@/components/Button";
-
-interface Exercise {
-  id: string;
-  name: string;
-  reps: string;
-  icon: string;
-}
-
-interface WorkoutSection {
-  id: string;
-  name: string;
-  description: string;
-  exercises: Exercise[];
-}
-
-const workoutData: WorkoutSection[] = [
-  {
-    id: "mobility",
-    name: "Mobility",
-    description: "Get moving with some pre-workout exercises!",
-    exercises: [
-      {
-        id: "1",
-        name: "Hamstring stretch",
-        reps: "10 reps each side",
-        icon: "dumbbell",
-      },
-      {
-        id: "2",
-        name: "Hip rotations",
-        reps: "10 reps each side",
-        icon: "dumbbell",
-      },
-      {
-        id: "3",
-        name: "Shoulder rolls",
-        reps: "10 reps each side",
-        icon: "dumbbell",
-      },
-      {
-        id: "4",
-        name: "Ankle circles",
-        reps: "10 reps each side",
-        icon: "dumbbell",
-      },
-      {
-        id: "5",
-        name: "Arm swings",
-        reps: "10 reps each side",
-        icon: "dumbbell",
-      },
-    ],
-  },
-  {
-    id: "workout",
-    name: "Workout",
-    description: "Main workout routine to build strength and endurance!",
-    exercises: [
-      {
-        id: "6",
-        name: "Push-ups",
-        reps: "15 reps",
-        icon: "dumbbell",
-      },
-      {
-        id: "7",
-        name: "Squats",
-        reps: "20 reps",
-        icon: "dumbbell",
-      },
-      {
-        id: "8",
-        name: "Plank",
-        reps: "30 seconds",
-        icon: "dumbbell",
-      },
-    ],
-  },
-  {
-    id: "stretch",
-    name: "Stretch",
-    description: "Cool down with relaxing stretches!",
-    exercises: [
-      {
-        id: "9",
-        name: "Forward fold",
-        reps: "Hold 30 seconds",
-        icon: "dumbbell",
-      },
-      {
-        id: "10",
-        name: "Child's pose",
-        reps: "Hold 30 seconds",
-        icon: "dumbbell",
-      },
-    ],
-  },
-];
+import { useLogging } from "@/data/logging";
+import {
+  workoutLibrary,
+  runPlans,
+  strengthPlans,
+  type Workout,
+  type Exercise,
+} from "@/data/workouts";
 
 export default function WorkoutPage() {
   const [activeTab, setActiveTab] = useState("mobility");
@@ -122,12 +32,116 @@ export default function WorkoutPage() {
   );
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const logging = useLogging();
 
-  const { workoutID } = useLocalSearchParams<{
+  const { workoutID, workoutKey, planType, planLevel } = useLocalSearchParams<{
     workoutID?: string;
+    workoutKey?: string;
+    planType?: "running" | "strength";
+    planLevel?: string;
   }>();
 
-  const activeSection = workoutData.find((section) => section.id === activeTab);
+  // Get workout data based on parameters
+  const getWorkoutData = (): {
+    workout: Workout | null;
+    mobility: Workout | null;
+    stretch: Workout | null;
+  } => {
+    let selectedWorkout: Workout | null = null;
+    let mobilityWorkout: Workout | null = null;
+    let stretchWorkout: Workout | null = null;
+
+    if (
+      workoutKey &&
+      Object.prototype.hasOwnProperty.call(workoutLibrary, workoutKey)
+    ) {
+      // Direct workout from library
+      selectedWorkout =
+        workoutLibrary[workoutKey as keyof typeof workoutLibrary];
+    } else if (planType && planLevel) {
+      // Get workout from plan
+      const plans = planType === "running" ? runPlans : strengthPlans;
+      const plan = plans[planLevel];
+
+      if (plan) {
+        const currentPhase = logging.calculateCurrentPhase();
+        if (currentPhase) {
+          const workouts = plan.phases[currentPhase].workouts;
+
+          // Get today's workout (first workout for now, could be enhanced with day selection)
+          selectedWorkout = workouts[0] || null;
+          mobilityWorkout = plan.mobility;
+          stretchWorkout = plan.stretch;
+        }
+      }
+    } else {
+      // Fallback to current workout from logging
+      const currentWorkouts = logging.getCurrentWorkouts();
+      if (currentWorkouts && currentWorkouts.length > 0) {
+        selectedWorkout = currentWorkouts[0];
+      }
+
+      // Get mobility and stretch from current plan
+      const currentPlan = logging.getCurrentPlan();
+      if (currentPlan) {
+        mobilityWorkout = currentPlan.mobility;
+        stretchWorkout = currentPlan.stretch;
+      }
+    }
+
+    return {
+      workout: selectedWorkout,
+      mobility: mobilityWorkout,
+      stretch: stretchWorkout,
+    };
+  };
+
+  const { workout, mobility, stretch } = getWorkoutData();
+
+  // Create sections array with workout data
+  const workoutSections: Array<{
+    id: string;
+    workout: Workout;
+    name: string;
+    description: string;
+  }> = [
+    ...(mobility
+      ? [
+          {
+            id: "mobility",
+            workout: mobility,
+            name: "Mobility",
+            description: "Get moving with some pre-workout exercises!",
+          },
+        ]
+      : []),
+    ...(workout
+      ? [
+          {
+            id: "workout",
+            workout: workout,
+            name: workout.name,
+            description: `${
+              workout.estimatedDuration ? `${workout.estimatedDuration} • ` : ""
+            }${workout.difficulty || "Medium"} intensity workout`,
+          },
+        ]
+      : []),
+    ...(stretch
+      ? [
+          {
+            id: "stretch",
+            workout: stretch,
+            name: "Stretch",
+            description: "Cool down with relaxing stretches!",
+          },
+        ]
+      : []),
+  ];
+
+  const activeSection = workoutSections.find(
+    (section) => section.id === activeTab
+  );
 
   const toggleExerciseComplete = (exerciseId: string) => {
     setCompletedExercises((prev) => {
@@ -146,15 +160,17 @@ export default function WorkoutPage() {
 
       // Exercise was just checked - see if section is now complete
       if (activeSection) {
-        const sectionExerciseIds = activeSection.exercises.map((ex) => ex.id);
+        const sectionExerciseIds = activeSection.workout.exercises.map(
+          (_, index) => `${activeSection.id}-${index}`
+        );
         const allCompleted = sectionExerciseIds.every((id) => newSet.has(id));
 
         if (allCompleted && sectionExerciseIds.length > 0) {
           // Find next section
-          const currentIndex = workoutData.findIndex(
+          const currentIndex = workoutSections.findIndex(
             (section) => section.id === activeTab
           );
-          const nextSection = workoutData[currentIndex + 1];
+          const nextSection = workoutSections[currentIndex + 1];
 
           if (nextSection) {
             // Auto-advance to next section after a short delay
@@ -178,16 +194,32 @@ export default function WorkoutPage() {
   };
 
   const handleNext = () => {
-    const currentIndex = workoutData.findIndex(
+    const currentIndex = workoutSections.findIndex(
       (section) => section.id === activeTab
     );
-    const nextSection = workoutData[currentIndex + 1];
+    const nextSection = workoutSections[currentIndex + 1];
 
     if (nextSection) {
       // Move to next section
       setActiveTab(nextSection.id);
     } else {
-      // All sections complete - could navigate to completion screen
+      // All sections complete - log workout completion
+      if (workout) {
+        const totalExercises = workoutSections.reduce(
+          (total, section) => total + section.workout.exercises.length,
+          0
+        );
+        const completedCount = completedExercises.size;
+
+        logging.logWorkoutCompletion(
+          new Date(),
+          workout.name.toLowerCase().replace(/\s+/g, "-"),
+          workout.name,
+          completedCount,
+          totalExercises
+        );
+      }
+
       console.log("Workout complete!");
       router.push("/(tabs)/fitness");
     }
@@ -209,16 +241,17 @@ export default function WorkoutPage() {
   });
 
   const renderExerciseItem = (exercise: Exercise, index: number) => {
-    const isCompleted = completedExercises.has(exercise.id);
+    const exerciseId = `${activeSection?.id}-${index}`;
+    const isCompleted = completedExercises.has(exerciseId);
 
     return (
       <TouchableOpacity
-        key={exercise.id}
+        key={exerciseId}
         style={[
           styles.exerciseItem,
           isCompleted && styles.exerciseItemCompleted,
         ]}
-        onPress={() => toggleExerciseComplete(exercise.id)}
+        onPress={() => toggleExerciseComplete(exerciseId)}
         activeOpacity={0.7}
       >
         <View style={styles.exerciseNumber}>
@@ -251,13 +284,13 @@ export default function WorkoutPage() {
               isCompleted && styles.exerciseRepsCompleted,
             ]}
           >
-            {exercise.reps}
+            {exercise.description}
           </Text>
         </View>
 
         <TouchableOpacity
           style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
-          onPress={() => toggleExerciseComplete(exercise.id)}
+          onPress={() => toggleExerciseComplete(exerciseId)}
         >
           {isCompleted && (
             <FontAwesomeIcon icon={faCheck} size={16} color="#FFFFFF" />
@@ -334,7 +367,7 @@ export default function WorkoutPage() {
 
           {/* Tab Navigation */}
           <View style={styles.tabContainer}>
-            {workoutData.map((section) => (
+            {workoutSections.map((section) => (
               <TouchableOpacity
                 key={section.id}
                 style={[
@@ -377,15 +410,15 @@ export default function WorkoutPage() {
         </View>
 
         <View style={styles.exercisesList}>
-          {activeSection?.exercises.map((exercise, index) =>
+          {activeSection?.workout.exercises.map((exercise, index) =>
             renderExerciseItem(exercise, index)
           )}
         </View>
       </Animated.ScrollView>
 
       {/* Bottom Button */}
-      {workoutData.findIndex((section) => section.id === activeTab) ===
-        workoutData.length - 1 && (
+      {workoutSections.findIndex((section) => section.id === activeTab) ===
+        workoutSections.length - 1 && (
         <View
           style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}
         >

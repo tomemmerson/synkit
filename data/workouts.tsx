@@ -1,6 +1,6 @@
 import { ImageSourcePropType } from "react-native";
 
-type Exercise = {
+export type Exercise = {
   name: string;
   description: string;
   icon: string;

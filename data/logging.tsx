@@ -51,7 +51,7 @@ export function dateToString(date: Date): string {
 }
 
 export interface SettingsActions {
-  logPeriod: (day: Date, flow?: Flow) => void;
+  logPeriod: (day: Date, flow: Flow, symptoms: Symptoms[]) => void;
   logMood: (day: Date, mood: string) => void;
   dayLog: (day: Date) => LogDays[string] | undefined;
   setWorkoutPlan: (plan: WorkoutPlanType) => void;
@@ -80,6 +80,7 @@ export interface SettingsActions {
     phase: PhaseType
   ) => WorkoutCompletion[];
   isWorkoutComplete: (workout: Workout, days?: number) => boolean;
+  clearWorkoutHistory: () => void;
 }
 
 export const useLogging = create<
@@ -115,7 +116,7 @@ export const useLogging = create<
 
         return undefined;
       },
-      logPeriod: (day, flow?: Flow) => {
+      logPeriod: (day, flow: Flow, symptoms: Symptoms[]) => {
         set((state) => {
           const dateKey = dateToString(day);
           return {
@@ -125,7 +126,7 @@ export const useLogging = create<
                 ...state.days[dateKey],
                 period: {
                   flow: flow,
-                  symptoms: [],
+                  symptoms: symptoms || [],
                 },
               },
             },
@@ -293,8 +294,7 @@ export const useLogging = create<
 
         // Filter out workouts that have been completed
         const incompleteWorkouts = section.filter((workout) => {
-          const workoutId = workout.name.toLowerCase().replace(/\s+/g, "-");
-          return !completedWorkoutIds.has(workoutId);
+          return !completedWorkoutIds.has(workout.id);
         });
 
         return incompleteWorkouts;
@@ -406,7 +406,7 @@ export const useLogging = create<
       isWorkoutComplete: (workout: Workout, days: number = 10) => {
         const { days: logDays } = get();
         const today = new Date();
-        const workoutId = workout.name.toLowerCase().replace(/\s+/g, "-");
+        const workoutId = workout.id;
 
         // Check the last N days for workout completions
         for (let i = 0; i < days; i++) {
@@ -426,6 +426,23 @@ export const useLogging = create<
         }
 
         return false;
+      },
+      clearWorkoutHistory: () => {
+        set((state) => {
+          const updatedDays = { ...state.days };
+
+          // Remove workouts from all days while preserving other data (period, mood)
+          Object.keys(updatedDays).forEach((dateKey) => {
+            if (updatedDays[dateKey].workouts) {
+              const { workouts, ...restOfDay } = updatedDays[dateKey];
+              updatedDays[dateKey] = restOfDay;
+            }
+          });
+
+          return {
+            days: updatedDays,
+          };
+        });
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 
 export interface SelectionOption {
@@ -18,25 +19,40 @@ export interface SelectionOption {
     color: string;
     size?: number;
   };
+  image?: {
+    image: any;
+  };
   label: string;
 }
 
 interface SelectionScrollProps {
   options: SelectionOption[];
   selectedId?: string;
+  selectedIds?: string[];
   onSelect: (id: string) => void;
   style?: any;
   title?: string;
+  multiSelect?: boolean;
 }
 
 const SelectionScroll: React.FC<SelectionScrollProps> = ({
   options,
   selectedId,
+  selectedIds,
   onSelect,
   title,
   style,
+  multiSelect = false,
 }) => {
   const SIDE_SPACING = 20;
+
+  const isSelected = (optionId: string) => {
+    if (multiSelect && selectedIds) {
+      return selectedIds.includes(optionId);
+    }
+    return selectedId === optionId;
+  };
+
   return (
     <View>
       {title && <Text style={styles.title}>{title}</Text>}
@@ -60,16 +76,22 @@ const SelectionScroll: React.FC<SelectionScrollProps> = ({
             <View
               style={[
                 styles.iconContainer,
-                selectedId === option.id && styles.selectedOption,
+                isSelected(option.id) && styles.selectedOption,
               ]}
             >
-              {option.emoji ? (
-                <Text style={styles.emoji}>{option.emoji}</Text>
-              ) : (
+              {option.emoji && <Text style={styles.emoji}>{option.emoji}</Text>}
+              {option.icon && (
                 <FontAwesomeIcon
                   icon={option.icon?.icon || faXmark}
                   color={option.icon?.color || "#000"}
                   size={option.icon?.size || 38}
+                />
+              )}
+              {option.image && (
+                <Image
+                  source={option.image.image}
+                  style={{ width: 50, height: 50 }}
+                  resizeMode="contain"
                 />
               )}
             </View>

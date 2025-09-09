@@ -14,7 +14,7 @@ import {
   faSadTear,
   faSmile,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Flow, useLogging } from "@/data/logging";
+import { Flow, Symptoms, useLogging } from "@/data/logging";
 
 interface Options extends SelectionOption {
   id: Flow;
@@ -59,15 +59,80 @@ const periodOptions: Options[] = [
   },
 ];
 
-function PeriodSheet(props: SheetProps<"mood-sheet">) {
-  const [selectedPeriod, setSelectedPeriod] = useState<Flow | undefined>(
-    undefined
-  );
+interface SymptomOptions extends SelectionOption {
+  id: Symptoms;
+}
 
+const symptomOptions: SymptomOptions[] = [
+  {
+    id: "cramps",
+    image: {
+      image: require("@/assets/images/icons/cramps.png"),
+    },
+    label: "Cramps",
+  },
+  {
+    id: "bloating",
+    image: {
+      image: require("@/assets/images/icons/bloating.png"),
+    },
+    label: "Bloating",
+  },
+  {
+    id: "mood-swings",
+    image: {
+      image: require("@/assets/images/icons/mood-swings.png"),
+    },
+    label: "Mood Swings",
+  },
+  {
+    id: "headaches",
+    image: {
+      image: require("@/assets/images/icons/headache.png"),
+    },
+    label: "Headache",
+  },
+  {
+    id: "fatigue",
+    image: {
+      image: require("@/assets/images/icons/fatigue.png"),
+    },
+    label: "Fatigue",
+  },
+];
+
+function PeriodSheet(props: SheetProps<"mood-sheet">) {
   const logging = useLogging();
+
+  const defaultFlow =
+    logging.dayLog(props.payload?.selectedDate || new Date())?.period?.flow ||
+    "light";
+
+  const defaultSymptoms =
+    logging.dayLog(props.payload?.selectedDate || new Date())?.period
+      ?.symptoms || [];
+
+  console.log("defaultSymptoms", defaultSymptoms);
+
+  const [selectedPeriod, setSelectedPeriod] = useState<Flow | undefined>(
+    defaultFlow
+  );
+  const [selectedSymptoms, setSelectedSymptoms] = useState<Symptoms[] | []>(
+    defaultSymptoms
+  );
 
   const handlePeriodSelect = (periodId: any) => {
     setSelectedPeriod(periodId);
+  };
+
+  const handleSymptomSelect = (symptomId: Symptoms) => {
+    if (selectedSymptoms.includes(symptomId)) {
+      setSelectedSymptoms((prev) =>
+        prev.filter((symptom) => symptom !== symptomId)
+      );
+    } else {
+      setSelectedSymptoms((prev) => [...prev, symptomId]);
+    }
   };
 
   const handleLogPeriod = () => {
@@ -76,7 +141,16 @@ function PeriodSheet(props: SheetProps<"mood-sheet">) {
       return;
     }
 
-    logging.logPeriod(props.payload.selectedDate, selectedPeriod);
+    if (!selectedPeriod) {
+      console.error("No period flow selected.");
+      return;
+    }
+
+    logging.logPeriod(
+      props.payload.selectedDate,
+      selectedPeriod,
+      selectedSymptoms
+    );
     SheetManager.hide("period-sheet");
   };
 
@@ -94,9 +168,10 @@ function PeriodSheet(props: SheetProps<"mood-sheet">) {
       />
       <SelectionScroll
         title="Symptoms"
-        options={periodOptions}
-        selectedId={selectedPeriod}
-        onSelect={handlePeriodSelect}
+        options={symptomOptions}
+        selectedIds={selectedSymptoms}
+        multiSelect
+        onSelect={handleSymptomSelect}
       />
     </BaseSheet>
   );

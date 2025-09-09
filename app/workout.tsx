@@ -24,6 +24,7 @@ import {
   type Workout,
   type Exercise,
   WorkoutID,
+  plans,
 } from "@/data/workouts";
 
 export default function WorkoutPage() {
@@ -36,8 +37,10 @@ export default function WorkoutPage() {
   const logging = useLogging();
 
   const { workoutID } = useLocalSearchParams<{
-    workoutID?: WorkoutID;
+    workoutID: WorkoutID;
   }>();
+
+  console.log("workoutId", workoutID);
 
   // Get workout data based on parameters
   const getWorkoutData = (): {
@@ -46,18 +49,28 @@ export default function WorkoutPage() {
     stretch: Workout | null;
   } => {
     let selectedWorkout: Workout | null = null;
-    let mobilityWorkout: Workout | null = null;
-    let stretchWorkout: Workout | null = null;
 
     if (workoutID) {
       // Direct workout from library
       selectedWorkout = workoutLibrary[workoutID];
+    } else {
+      throw new Error("No workout ID provided");
+    }
+
+    const plan = logging.currentWorkoutPlan;
+    if (!plan) {
+      throw new Error("No workout plan set");
+    }
+
+    const level = logging.currentWorkoutLevel;
+    if (!level) {
+      throw new Error("No workout level set");
     }
 
     return {
       workout: selectedWorkout,
-      mobility: mobilityWorkout,
-      stretch: stretchWorkout,
+      mobility: plans[plan][level].mobility,
+      stretch: plans[plan][level].stretch,
     };
   };
 
@@ -85,7 +98,7 @@ export default function WorkoutPage() {
           {
             id: "workout",
             workout: workout,
-            name: workout.name,
+            name: "Workout",
             description: `${
               workout.estimatedDuration ? `${workout.estimatedDuration} • ` : ""
             }${workout.difficulty || "Medium"} intensity workout`,
@@ -178,7 +191,7 @@ export default function WorkoutPage() {
 
         logging.logWorkoutCompletion(
           new Date(),
-          workout.name.toLowerCase().replace(/\s+/g, "-"),
+          workout.id,
           workout.name,
           completedCount,
           totalExercises
@@ -316,12 +329,12 @@ export default function WorkoutPage() {
                   },
                 ]}
               >
-                Full body workout
+                {workout?.name}
               </Animated.Text>
               <Animated.Text
                 style={[styles.workoutDuration, { opacity: durationOpacity }]}
               >
-                45mins
+                {workout?.estimatedDuration}
               </Animated.Text>
             </View>
 
@@ -458,6 +471,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 4,
     alignItems: "center",
+    justifyContent: "center",
   },
   activeTab: {
     backgroundColor: "white",
@@ -466,6 +480,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     color: "#E6D9EA",
+    textAlign: "center",
   },
   activeTabText: {
     color: "#614178",

@@ -17,6 +17,10 @@ import { SheetManager } from "react-native-actions-sheet";
 import Heading from "@/components/Heading";
 import Subheading from "@/components/Subheading";
 import { useLogging } from "@/data/logging";
+import { workoutLibrary } from "@/data/workouts";
+import { router } from "expo-router";
+import { moodIDToIcon } from "@/components/sheets/Mood";
+import * as luxon from "luxon";
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -55,7 +59,29 @@ export default function HomeScreen() {
 
   const [selectedDate, setSelectedDate] = React.useState(new Date());
 
-  const { dayLog, name } = useLogging();
+  const logging = useLogging();
+  const workouts = logging.getCurrentWorkouts(true);
+
+  if (!workouts || workouts.length === 0) {
+    return (
+      <View>
+        <Text>No workouts available</Text>
+      </View>
+    );
+  }
+
+  const completedToday = logging.getWorkoutCompletions(new Date());
+
+  let todaysWorkout = workouts[0];
+  let workoutComplete = false;
+
+  if (completedToday.length > 0) {
+    const t = workoutLibrary[completedToday[0].workoutId];
+    if (t) {
+      workoutComplete = true;
+      todaysWorkout = t;
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -73,7 +99,9 @@ export default function HomeScreen() {
             },
           ]}
         >
-          <Text style={styles.topBarText}>20th June</Text>
+          <Text style={styles.topBarText}>
+            {luxon.DateTime.fromJSDate(selectedDate).toFormat("d MMMM")}
+          </Text>
         </Animated.View>
 
         <Animated.ScrollView
@@ -88,7 +116,7 @@ export default function HomeScreen() {
           {/* Animated Header */}
           <Animated.View style={[styles.header, { opacity: headerOpacity }]}>
             <Heading style={styles.greeting}>{getGreeting()}</Heading>
-            <Text style={styles.username}>{name}!</Text>
+            <Text style={styles.username}>{logging.name}!</Text>
           </Animated.View>
           {/* Header with Calendar */}
           <CalendarWidget
@@ -110,14 +138,18 @@ export default function HomeScreen() {
             <View style={styles.sectionContainer}>
               <Subheading>Todays Workout</Subheading>
               <WorkoutCard
-                title="Low Impact Workout"
+                title={todaysWorkout.name}
                 difficulty="Medium"
-                duration="45min"
-                exercises={8}
                 onPress={() => {
-                  // Handle workout press
-                  console.log("Workout pressed");
+                  !workoutComplete &&
+                    router.push({
+                      pathname: "/workout",
+                      params: { workoutID: todaysWorkout.id },
+                    });
                 }}
+                duration={todaysWorkout.estimatedDuration || ""}
+                exercises={todaysWorkout.exercises.length}
+                complete={workoutComplete}
               />
             </View>
 
@@ -130,10 +162,16 @@ export default function HomeScreen() {
                   <View style={styles.halfCard}>
                     <StatusCard
                       type="Period"
-                      title="Light"
-                      subtitle="Day 1"
+                      title={
+                        logging.dayLog(selectedDate)?.period
+                          ? logging.dayLog(selectedDate)?.period?.flow || "-"
+                          : "Not logged"
+                      }
+                      subtitle={"-"}
                       status={
-                        dayLog(selectedDate)?.period ? "completed" : "add"
+                        logging.dayLog(selectedDate)?.period
+                          ? "completed"
+                          : "add"
                       }
                       color="#E29A96"
                       onPress={() =>
@@ -149,9 +187,11 @@ export default function HomeScreen() {
                   <View style={styles.halfCard}>
                     <StatusCard
                       type="Mood"
-                      title={dayLog(selectedDate)?.mood || "Not logged"}
+                      title={logging.dayLog(selectedDate)?.mood || "Not logged"}
                       subtitle="-"
-                      status={dayLog(selectedDate)?.mood ? "completed" : "add"}
+                      status={
+                        logging.dayLog(selectedDate)?.mood ? "completed" : "add"
+                      }
                       color="#D196E2"
                       onPress={() => {
                         SheetManager.show("mood-sheet", {
@@ -160,7 +200,11 @@ export default function HomeScreen() {
                           },
                         });
                       }}
-                      icon={faFaceLaugh}
+                      icon={
+                        moodIDToIcon(
+                          logging.dayLog(selectedDate)?.mood || "happy"
+                        )?.icon ?? faFaceLaugh
+                      }
                     />
                   </View>
                 </View>

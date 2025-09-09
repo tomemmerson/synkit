@@ -22,8 +22,6 @@ import { plans, workoutLibrary } from "@/data/workouts";
 export default function Fitness() {
   const logging = useLogging();
 
-  console.log("Current phase:", logging.calculateCurrentPhase());
-
   const workouts = logging.getCurrentWorkouts(true);
 
   if (!workouts || workouts.length === 0) {
@@ -40,8 +38,6 @@ export default function Fitness() {
   let workoutComplete = false;
 
   if (completedToday.length > 0) {
-    console.log("Completed workouts today:", completedToday);
-
     const t = workoutLibrary[completedToday[0].workoutId];
     if (t) {
       workoutComplete = true;
@@ -72,21 +68,29 @@ export default function Fitness() {
                 <WorkoutCard
                   title={todaysWorkout.name}
                   difficulty="Medium"
-                  onPress={() => SheetManager.show("workout-sheet")}
+                  onPress={() => {
+                    !workoutComplete &&
+                      router.push({
+                        pathname: "/workout",
+                        params: { workoutID: todaysWorkout.id },
+                      });
+                  }}
                   duration={todaysWorkout.estimatedDuration || ""}
                   exercises={todaysWorkout.exercises.length}
                   complete={workoutComplete}
                 />
-                <Button
-                  title="Start Workout"
-                  round
-                  onPress={() => {
-                    router.push({
-                      pathname: "/workout",
-                      params: { workoutID: todaysWorkout. },
-                    });
-                  }}
-                />
+                {!workoutComplete && (
+                  <Button
+                    title="Start Workout"
+                    round
+                    onPress={() => {
+                      router.push({
+                        pathname: "/workout",
+                        params: { workoutID: todaysWorkout.id },
+                      });
+                    }}
+                  />
+                )}
               </>
             )}
           </View>

@@ -15,7 +15,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Mood, useLogging } from "@/data/logging";
 
-const moodOptions: (SelectionOption & { id: Mood })[] = [
+export const moodOptions: (SelectionOption & { id: Mood })[] = [
   {
     id: "happy",
     icon: {
@@ -49,6 +49,11 @@ const moodOptions: (SelectionOption & { id: Mood })[] = [
     label: "Angry",
   },
 ];
+
+export const moodIDToIcon = (id: string) => {
+  const mood = moodOptions.find((m) => m.id === id);
+  return mood ? mood.icon : null;
+};
 
 type Props = {
   selectedDate: Date;

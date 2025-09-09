@@ -9,7 +9,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
-import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SheetProvider } from "react-native-actions-sheet";
 import { MenuProvider } from "react-native-popup-menu";
 
@@ -45,26 +44,24 @@ export default function RootLayout() {
   });
 
   return (
-    <KeyboardProvider>
-      <ThemeProvider value={DefaultTheme}>
-        <MenuProvider>
-          <SheetProvider context="global">
-            {/* {false && (
+    <ThemeProvider value={DefaultTheme}>
+      <MenuProvider>
+        <SheetProvider context="global">
+          {/* {false && (
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="(onboarding)" />
               </Stack>
             )} */}
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="workout" />
-            </Stack>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="workout" />
+          </Stack>
 
-            <StatusBar style="auto" />
-          </SheetProvider>
-        </MenuProvider>
-      </ThemeProvider>
-    </KeyboardProvider>
+          <StatusBar style="auto" />
+        </SheetProvider>
+      </MenuProvider>
+    </ThemeProvider>
   );
 }

@@ -10,6 +10,7 @@ import WorkoutCard from "@/components/WorkoutCard";
 import StatusCard from "@/components/StatusCard";
 import {
   faDroplet,
+  faDropletSlash,
   faFaceLaugh,
   faPersonWalking,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -181,7 +182,11 @@ export default function HomeScreen() {
                           },
                         })
                       }
-                      icon={faDroplet}
+                      icon={
+                        logging.dayLog(selectedDate)?.period?.flow === "none"
+                          ? faDropletSlash
+                          : faDroplet
+                      }
                     />
                   </View>
                   <View style={styles.halfCard}>

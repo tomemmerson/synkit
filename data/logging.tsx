@@ -12,7 +12,7 @@ import {
   WorkoutID,
 } from "./workouts";
 
-export type Flow = "light" | "medium" | "heavy" | "very-heavy";
+export type Flow = "light" | "medium" | "heavy" | "very-heavy" | "none";
 
 export type Symptoms =
   | "cramps"

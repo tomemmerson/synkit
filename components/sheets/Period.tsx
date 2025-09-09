@@ -11,6 +11,7 @@ import {
   faAngry,
   faDizzy,
   faDroplet,
+  faDropletSlash,
   faSadTear,
   faSmile,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -21,6 +22,15 @@ interface Options extends SelectionOption {
 }
 
 const periodOptions: Options[] = [
+  {
+    id: "none",
+    icon: {
+      icon: faDropletSlash,
+      color: "#5F2E71",
+      size: 30,
+    },
+    label: "None",
+  },
   {
     id: "light",
     icon: {
@@ -106,7 +116,7 @@ function PeriodSheet(props: SheetProps<"mood-sheet">) {
 
   const defaultFlow =
     logging.dayLog(props.payload?.selectedDate || new Date())?.period?.flow ||
-    "light";
+    "none";
 
   const defaultSymptoms =
     logging.dayLog(props.payload?.selectedDate || new Date())?.period

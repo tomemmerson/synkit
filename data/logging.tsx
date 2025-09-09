@@ -81,6 +81,7 @@ export interface SettingsActions {
   ) => WorkoutCompletion[];
   isWorkoutComplete: (workout: Workout, days?: number) => boolean;
   clearWorkoutHistory: () => void;
+  clearPeriodLogs: () => void;
 }
 
 export const useLogging = create<
@@ -167,7 +168,9 @@ export const useLogging = create<
         const { initialPeriodDate, days } = get();
 
         const periodKeys = Object.keys(days)
-          .filter((k) => !!days[k]?.period?.flow)
+          .filter(
+            (k) => days[k]?.period?.flow !== "none" && days[k]?.period?.flow
+          )
           .sort(); // chronological (YYYY-MM-DD)
 
         // If no logs, fall back to initialPeriodDate (if any)
@@ -435,6 +438,23 @@ export const useLogging = create<
           Object.keys(updatedDays).forEach((dateKey) => {
             if (updatedDays[dateKey].workouts) {
               const { workouts, ...restOfDay } = updatedDays[dateKey];
+              updatedDays[dateKey] = restOfDay;
+            }
+          });
+
+          return {
+            days: updatedDays,
+          };
+        });
+      },
+      clearPeriodLogs: () => {
+        set((state) => {
+          const updatedDays = { ...state.days };
+
+          // Remove period logs from all days while preserving other data (mood, workouts)
+          Object.keys(updatedDays).forEach((dateKey) => {
+            if (updatedDays[dateKey].period) {
+              const { period, ...restOfDay } = updatedDays[dateKey];
               updatedDays[dateKey] = restOfDay;
             }
           });

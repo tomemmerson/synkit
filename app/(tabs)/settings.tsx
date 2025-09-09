@@ -28,6 +28,27 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleClearPeriodLogs = () => {
+    Alert.alert(
+      "Clear Period Logs",
+      "Are you sure you want to clear all period data? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Clear",
+          style: "destructive",
+          onPress: () => {
+            logging.clearPeriodLogs();
+            Alert.alert("Success", "Period logs have been cleared.");
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -48,6 +69,21 @@ export default function SettingsScreen() {
           <Text style={styles.description}>
             This will remove all completed workout records while keeping your
             period and mood data.
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Period Data</Text>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Clear Period Logs"
+              onPress={handleClearPeriodLogs}
+              variant="secondary"
+            />
+          </View>
+          <Text style={styles.description}>
+            This will remove all period flow and symptom data while keeping your
+            workout and mood data.
           </Text>
         </View>
       </ScrollView>

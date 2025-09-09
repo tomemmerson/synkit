@@ -23,6 +23,7 @@ import {
   strengthPlans,
   type Workout,
   type Exercise,
+  WorkoutID,
 } from "@/data/workouts";
 
 export default function WorkoutPage() {
@@ -34,11 +35,8 @@ export default function WorkoutPage() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const logging = useLogging();
 
-  const { workoutID, workoutKey, planType, planLevel } = useLocalSearchParams<{
-    workoutID?: string;
-    workoutKey?: string;
-    planType?: "running" | "strength";
-    planLevel?: string;
+  const { workoutID } = useLocalSearchParams<{
+    workoutID?: WorkoutID;
   }>();
 
   // Get workout data based on parameters
@@ -51,42 +49,9 @@ export default function WorkoutPage() {
     let mobilityWorkout: Workout | null = null;
     let stretchWorkout: Workout | null = null;
 
-    if (
-      workoutKey &&
-      Object.prototype.hasOwnProperty.call(workoutLibrary, workoutKey)
-    ) {
+    if (workoutID) {
       // Direct workout from library
-      selectedWorkout =
-        workoutLibrary[workoutKey as keyof typeof workoutLibrary];
-    } else if (planType && planLevel) {
-      // Get workout from plan
-      const plans = planType === "running" ? runPlans : strengthPlans;
-      const plan = plans[planLevel];
-
-      if (plan) {
-        const currentPhase = logging.calculateCurrentPhase();
-        if (currentPhase) {
-          const workouts = plan.phases[currentPhase].workouts;
-
-          // Get today's workout (first workout for now, could be enhanced with day selection)
-          selectedWorkout = workouts[0] || null;
-          mobilityWorkout = plan.mobility;
-          stretchWorkout = plan.stretch;
-        }
-      }
-    } else {
-      // Fallback to current workout from logging
-      const currentWorkouts = logging.getCurrentWorkouts();
-      if (currentWorkouts && currentWorkouts.length > 0) {
-        selectedWorkout = currentWorkouts[0];
-      }
-
-      // Get mobility and stretch from current plan
-      const currentPlan = logging.getCurrentPlan();
-      if (currentPlan) {
-        mobilityWorkout = currentPlan.mobility;
-        stretchWorkout = currentPlan.stretch;
-      }
+      selectedWorkout = workoutLibrary[workoutID];
     }
 
     return {

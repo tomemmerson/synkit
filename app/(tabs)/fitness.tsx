@@ -17,6 +17,7 @@ import { useLogging } from "@/data/logging";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faRunning, faTimer } from "@fortawesome/pro-regular-svg-icons";
 import { faSpinnerScale } from "@fortawesome/pro-solid-svg-icons";
+import { plans, workoutLibrary } from "@/data/workouts";
 
 export default function Fitness() {
   const logging = useLogging();
@@ -24,6 +25,29 @@ export default function Fitness() {
   console.log("Current phase:", logging.calculateCurrentPhase());
 
   const workouts = logging.getCurrentWorkouts(true);
+
+  if (!workouts || workouts.length === 0) {
+    return (
+      <View>
+        <Text>No workouts available</Text>
+      </View>
+    );
+  }
+
+  const completedToday = logging.getWorkoutCompletions(new Date());
+
+  let todaysWorkout = workouts[0];
+  let workoutComplete = false;
+
+  if (completedToday.length > 0) {
+    console.log("Completed workouts today:", completedToday);
+
+    const t = workoutLibrary[completedToday[0].workoutId];
+    if (t) {
+      workoutComplete = true;
+      todaysWorkout = t;
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -43,20 +67,24 @@ export default function Fitness() {
             <Paragraph style={{ marginBottom: 16 }}>
               A workout picked just for you, based on your cycle phase.{" "}
             </Paragraph>
-            {workouts && workouts.length > 0 && (
+            {todaysWorkout && (
               <>
                 <WorkoutCard
-                  title={workouts[0].name}
+                  title={todaysWorkout.name}
                   difficulty="Medium"
                   onPress={() => SheetManager.show("workout-sheet")}
-                  duration={workouts[0].estimatedDuration || ""}
-                  exercises={5}
+                  duration={todaysWorkout.estimatedDuration || ""}
+                  exercises={todaysWorkout.exercises.length}
+                  complete={workoutComplete}
                 />
                 <Button
                   title="Start Workout"
                   round
                   onPress={() => {
-                    router.push("/workout");
+                    router.push({
+                      pathname: "/workout",
+                      params: { workoutID: todaysWorkout. },
+                    });
                   }}
                 />
               </>

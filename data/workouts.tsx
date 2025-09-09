@@ -7,6 +7,7 @@ export type Exercise = {
 };
 
 export type Workout = {
+  id: WorkoutID;
   day: number;
   name: string;
   estimatedDuration?: string;
@@ -39,12 +40,15 @@ export type WorkoutPlan = {
   stretch: Workout;
 };
 
-type Plan = Record<string, WorkoutPlan>;
+export type WorkoutID = keyof typeof workoutLibrary;
+
+export type Plan = Record<string, WorkoutPlan>;
 
 // Central workout library with memorable names
-export const workoutLibrary = {
+export const workoutLibrary: Record<string, Workout> = {
   // Walking workouts
   gentleWalk: {
+    id: "gentleWalk",
     day: 1,
     name: "Walk",
     exercises: [
@@ -60,6 +64,7 @@ export const workoutLibrary = {
 
   // Run/Walk workouts
   beginnerRunWalk: {
+    id: "beginner-run-walk",
     day: 2,
     name: "Run/Walk",
     exercises: [
@@ -73,6 +78,7 @@ export const workoutLibrary = {
   },
 
   follicularRunWalk: {
+    id: "follicular-run-walk",
     day: 1,
     name: "Run/Walk Intervals",
     exercises: [
@@ -85,6 +91,7 @@ export const workoutLibrary = {
   },
 
   ovulationRunWalk: {
+    id: "ovulation-run-walk",
     day: 1,
     name: "Run/Walk",
     exercises: [
@@ -97,6 +104,7 @@ export const workoutLibrary = {
   },
 
   intermediateRunWalk1: {
+    id: "intermediate-run-walk-1",
     day: 1,
     name: "Run/Walk Intervals",
     exercises: [
@@ -119,6 +127,7 @@ export const workoutLibrary = {
   },
 
   intermediateRunWalk2: {
+    id: "intermediateRunWalk2",
     day: 1,
     name: "Run/Walk",
     exercises: [
@@ -142,6 +151,7 @@ export const workoutLibrary = {
 
   // Stretch workouts
   basicStretch: {
+    id: "basicStretch",
     day: 3,
     name: "Stretch or Yoga Class",
     exercises: [
@@ -185,6 +195,7 @@ export const workoutLibrary = {
 
   // Strength workouts
   beginnerStrength: {
+    id: "beginnerStrength",
     day: 2,
     name: "Strength training",
     exercises: [
@@ -222,6 +233,7 @@ export const workoutLibrary = {
   },
 
   intermediateStrength: {
+    id: "intermediateStrength",
     day: 2,
     name: "Strength training",
     exercises: [
@@ -260,6 +272,7 @@ export const workoutLibrary = {
 
   // Advanced workouts
   lutealRunWalk: {
+    id: "lutealRunWalk",
     day: 1,
     name: "Run/Walk",
     exercises: [
@@ -277,6 +290,7 @@ export const workoutLibrary = {
   },
 
   ovulationRunWalkAdvanced: {
+    id: "ovulationRunWalkAdvanced",
     day: 3,
     name: "Run/Walk",
     exercises: [
@@ -294,6 +308,7 @@ export const workoutLibrary = {
   },
 
   lutealStrength: {
+    id: "lutealStrength",
     day: 2,
     name: "Strength training",
     exercises: [
@@ -331,6 +346,7 @@ export const workoutLibrary = {
   },
 
   lutealRunWalkLong: {
+    id: "lutealRunWalkLong",
     day: 3,
     name: "Run/walk",
     exercises: [
@@ -2603,4 +2619,9 @@ export const strengthPlans: Plan = {
     mobility: workoutLibrary.advancedStrengthLowerMobility,
     stretch: workoutLibrary.strengthStretchWorkout,
   },
+};
+
+export const plans: Record<WorkoutPlanType, Plan> = {
+  strength: strengthPlans,
+  running: runPlans,
 };

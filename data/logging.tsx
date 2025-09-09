@@ -9,6 +9,7 @@ import {
   WorkoutPlan,
   PhaseType,
   Workout,
+  WorkoutID,
 } from "./workouts";
 
 export type Flow = "light" | "medium" | "heavy" | "very-heavy";
@@ -23,7 +24,7 @@ export type Symptoms =
 export type Mood = "happy" | "sad" | "neutral" | "angry" | "overwhelmed";
 
 export type WorkoutCompletion = {
-  workoutId: string;
+  workoutId: WorkoutID;
   workoutName: string;
   planType: WorkoutPlanType;
   planLevel: WorkoutLevel;
@@ -78,6 +79,7 @@ export interface SettingsActions {
     planLevel: WorkoutLevel,
     phase: PhaseType
   ) => WorkoutCompletion[];
+  isWorkoutComplete: (workout: Workout, days?: number) => boolean;
 }
 
 export const useLogging = create<
@@ -400,6 +402,30 @@ export const useLogging = create<
             new Date(b.completedAt).getTime() -
             new Date(a.completedAt).getTime()
         );
+      },
+      isWorkoutComplete: (workout: Workout, days: number = 10) => {
+        const { days: logDays } = get();
+        const today = new Date();
+        const workoutId = workout.name.toLowerCase().replace(/\s+/g, "-");
+
+        // Check the last N days for workout completions
+        for (let i = 0; i < days; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          const dateKey = dateToString(date);
+          const dayWorkouts = logDays[dateKey]?.workouts || [];
+
+          // Check if any workout completion matches this workout
+          const isCompleted = dayWorkouts.some(
+            (completion) => completion.workoutId === workoutId
+          );
+
+          if (isCompleted) {
+            return true;
+          }
+        }
+
+        return false;
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

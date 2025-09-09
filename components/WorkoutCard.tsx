@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faBolt, faPlus } from "@fortawesome/pro-solid-svg-icons";
+import { faBolt, faPlus, faCheck } from "@fortawesome/pro-solid-svg-icons";
+import { faPartyHorn } from "@fortawesome/pro-regular-svg-icons";
 
 interface WorkoutCardProps {
   title: string;
@@ -9,6 +10,7 @@ interface WorkoutCardProps {
   duration: string;
   exercises: number;
   onPress?: () => void;
+  complete?: boolean;
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({
@@ -17,6 +19,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   duration,
   exercises,
   onPress,
+  complete = false,
 }) => {
   const getDifficultyDots = (level: string) => {
     const totalDots = 3;
@@ -61,16 +64,30 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
             </View>
             <Text style={styles.difficultyText}>{difficulty} difficulty</Text>
           </View>
-          <TouchableOpacity style={styles.addButton}>
-            <FontAwesomeIcon icon={faPlus} size={16} color="white" />
+          <TouchableOpacity
+            style={[styles.addButton, complete && styles.completeButton]}
+          >
+            {complete ? (
+              <FontAwesomeIcon icon={faCheck} size={16} color="#DEC291" />
+            ) : (
+              <FontAwesomeIcon icon={faPlus} size={16} color="white" />
+            )}
           </TouchableOpacity>
         </View>
+
         <View style={styles.textContent}>
           <Text style={styles.title}>{title}</Text>
 
-          <Text style={styles.details}>
-            {duration} • {exercises} exercises
-          </Text>
+          {complete ? (
+            <View style={styles.completedBadge}>
+              <FontAwesomeIcon icon={faPartyHorn} size={13} color="#C4AA7D" />
+              <Text style={styles.completedText}>Workout completed</Text>
+            </View>
+          ) : (
+            <Text style={styles.details}>
+              {duration} • {exercises} exercises
+            </Text>
+          )}
         </View>
       </View>
 
@@ -191,6 +208,26 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     zIndex: -1,
     opacity: 0.8,
+  },
+  completeButton: {
+    backgroundColor: "white",
+  },
+  completedBadge: {
+    backgroundColor: "white",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 5,
+  },
+  completedText: {
+    fontSize: 14,
+    color: "#C4AA7D",
+    fontWeight: "600",
   },
 });
 

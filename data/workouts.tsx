@@ -2410,7 +2410,7 @@ export const runPlans: Plan = {
     name: "Running Beginner",
     level: "Beginner",
     requirements: "No previous running experience required",
-    icon: require("@/assets/images/strength/strength-small.png"),
+    icon: require("@/assets/images/running/walking.png"),
     phases: {
       id: "phases",
       menstrual: {
@@ -2449,7 +2449,7 @@ export const runPlans: Plan = {
     name: "Running Intermediate Beginner",
     level: "Intermediate Beginner",
     requirements: "Some previous running experience recommended",
-    icon: require("@/assets/images/strength/strength-small.png"),
+    icon: require("@/assets/images/running/fast-walking.png"),
     phases: {
       id: "phases",
       menstrual: {
@@ -2488,7 +2488,7 @@ export const runPlans: Plan = {
     name: "Running Intermediate Advanced",
     level: "Intermediate Advanced",
     requirements: "Solid running foundation and experience with longer runs",
-    icon: require("@/assets/images/strength/strength-medium.png"),
+    icon: require("@/assets/images/running/run.png"),
     phases: {
       id: "phases",
       menstrual: {
@@ -2530,7 +2530,7 @@ export const runPlans: Plan = {
     name: "Running Advanced",
     level: "Advanced",
     requirements: "Experienced runner with strong endurance base",
-    icon: require("@/assets/images/strength/strength-large.png"),
+    icon: require("@/assets/images/running/fast-run.png"),
     phases: {
       id: "phases",
       menstrual: {

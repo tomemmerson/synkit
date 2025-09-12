@@ -11,9 +11,22 @@ function ChangePlanSheet(props: SheetProps<"change-plan-sheet">) {
   const [selectedTab, setSelectedTab] = useState<WorkoutPlanType>(
     logging.currentWorkoutPlan || "strength"
   );
-  const [selectedLevel, setSelectedLevel] = useState<string | null>(
-    logging.currentWorkoutLevel || null
+
+  // Track selections for each tab separately
+  const [strengthSelection, setStrengthSelection] = useState<string | null>(
+    logging.currentWorkoutPlan === "strength"
+      ? logging.currentWorkoutLevel || null
+      : null
   );
+  const [runningSelection, setRunningSelection] = useState<string | null>(
+    logging.currentWorkoutPlan === "running"
+      ? logging.currentWorkoutLevel || null
+      : null
+  );
+
+  // Get current selection based on active tab
+  const selectedLevel =
+    selectedTab === "strength" ? strengthSelection : runningSelection;
 
   const handleSave = () => {
     if (selectedLevel) {
@@ -25,7 +38,6 @@ function ChangePlanSheet(props: SheetProps<"change-plan-sheet">) {
 
   const currentPlans = selectedTab === "strength" ? strengthPlans : runPlans;
 
-  console.log("Current Plans:", selectedTab);
   return (
     <BaseSheet
       title="Change workout plan"
@@ -39,7 +51,6 @@ function ChangePlanSheet(props: SheetProps<"change-plan-sheet">) {
             style={[styles.tab, selectedTab === "strength" && styles.activeTab]}
             onPress={() => {
               setSelectedTab("strength");
-              setSelectedLevel(null); // Reset selection when switching tabs
             }}
             activeOpacity={0.7}
           >
@@ -56,7 +67,6 @@ function ChangePlanSheet(props: SheetProps<"change-plan-sheet">) {
             style={[styles.tab, selectedTab === "running" && styles.activeTab]}
             onPress={() => {
               setSelectedTab("running");
-              setSelectedLevel(null); // Reset selection when switching tabs
             }}
             activeOpacity={0.7}
           >
@@ -80,7 +90,13 @@ function ChangePlanSheet(props: SheetProps<"change-plan-sheet">) {
                 styles.levelCard,
                 selectedLevel === key && styles.levelCardSelected,
               ]}
-              onPress={() => setSelectedLevel(key)}
+              onPress={() => {
+                if (selectedTab === "strength") {
+                  setStrengthSelection(key);
+                } else {
+                  setRunningSelection(key);
+                }
+              }}
               activeOpacity={0.7}
             >
               <View style={styles.levelImageContainer}>

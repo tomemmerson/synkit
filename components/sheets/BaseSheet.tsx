@@ -14,12 +14,13 @@ type Props = {
 function BaseSheet({ children, onSelect, title, buttonName }: Props) {
   return (
     <ActionSheet
-      snapPoints={[100]}
       gestureEnabled
       containerStyle={{
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
       }}
+      snapPoints={[99]} // Add consistent snap points
+      initialSnapIndex={0}
     >
       <View style={styles.container}>
         <View style={[styles.header, styles.outerMargin]}>

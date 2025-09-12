@@ -147,7 +147,11 @@ export default function Fitness() {
                 <Paragraph>Workout plan</Paragraph>
               </View>
 
-              <Button title="Change" variant="secondary" />
+              <Button
+                title="Change"
+                variant="secondary"
+                onPress={() => SheetManager.show("change-plan-sheet")}
+              />
             </Card>
           </View>
           <View style={styles.section}>

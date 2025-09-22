@@ -115,11 +115,6 @@ export default function Fitness() {
                 </Subheading>
                 <Text style={styles.phaseItemLabel}>Day</Text>
               </View>
-              <View style={styles.phaseItem}>
-                <FontAwesomeIcon icon={faRunning} size={17} color="#6153F5" />
-                <Subheading style={styles.phaseItemText}>High</Subheading>
-                <Text style={styles.phaseItemLabel}>Energy level</Text>
-              </View>
             </Card>
           </View>
           <View style={styles.section}>
@@ -187,7 +182,9 @@ const styles = StyleSheet.create({
   phases: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
+    gap: 20,
+    width: "auto",
   },
   phaseItem: {
     display: "flex",

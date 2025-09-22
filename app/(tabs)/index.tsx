@@ -8,11 +8,14 @@ import { StatusBar } from "expo-status-bar";
 import CalendarWidget from "@/components/CalendarWidget";
 import WorkoutCard from "@/components/WorkoutCard";
 import StatusCard from "@/components/StatusCard";
+import TipCard from "@/components/TipCard";
 import {
   faDroplet,
   faDropletSlash,
   faFaceLaugh,
   faPersonWalking,
+  faAppleWhole,
+  faBrain,
 } from "@fortawesome/pro-solid-svg-icons";
 import { SheetManager } from "react-native-actions-sheet";
 import Heading from "@/components/Heading";
@@ -21,6 +24,7 @@ import { useLogging } from "@/data/logging";
 import { workoutLibrary } from "@/data/workouts";
 import { router } from "expo-router";
 import { moodIDToIcon } from "@/components/sheets/Mood";
+import { getDailyTips, type Phase } from "@/data/tips";
 import * as luxon from "luxon";
 
 export default function HomeScreen() {
@@ -84,6 +88,12 @@ export default function HomeScreen() {
     }
   }
 
+  // Get current phase and daily tips
+  const currentPhase = logging.calculateCurrentPhase(selectedDate) as Phase;
+  const dailyTips = currentPhase
+    ? getDailyTips(currentPhase, selectedDate)
+    : null;
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -136,6 +146,28 @@ export default function HomeScreen() {
                 marginTop: 0,
               }}
             />
+            {/* Daily Tips Section */}
+            {currentPhase && dailyTips && (
+              <View style={styles.sectionContainer}>
+                <View style={styles.tipsContainer}>
+                  <TipCard
+                    title={dailyTips.nutrition}
+                    subtitle="Today's Nutrition Tip"
+                    color="#95C99B"
+                    icon={faAppleWhole}
+                    onPress={() => {}}
+                  />
+                  <TipCard
+                    title={dailyTips.productivity}
+                    subtitle="Today's Productivity Tip"
+                    color="#9BB5C9"
+                    icon={faBrain}
+                    onPress={() => {}}
+                  />
+                </View>
+              </View>
+            )}
+
             <View style={styles.sectionContainer}>
               <Subheading>Todays Workout</Subheading>
               <WorkoutCard
@@ -297,6 +329,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fullCard: {
+    width: "100%",
+  },
+  tipsContainer: {
     width: "100%",
   },
 });

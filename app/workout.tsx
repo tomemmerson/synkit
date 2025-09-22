@@ -244,7 +244,11 @@ export default function WorkoutPage() {
         </View>
 
         <View style={styles.exerciseIcon}>
-          <FontAwesomeIcon icon={faDumbbell} size={24} color="#A184AB" />
+          {exercise.icon ? (
+            <Image source={exercise.icon} style={{ width: 40, height: 48 }} />
+          ) : (
+            <FontAwesomeIcon icon={faDumbbell} size={24} color="#A184AB" />
+          )}
         </View>
 
         <View style={styles.exerciseContent}>

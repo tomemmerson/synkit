@@ -146,27 +146,6 @@ export default function HomeScreen() {
                 marginTop: 0,
               }}
             />
-            {/* Daily Tips Section */}
-            {currentPhase && dailyTips && (
-              <View style={styles.sectionContainer}>
-                <View style={styles.tipsContainer}>
-                  <TipCard
-                    title={dailyTips.nutrition}
-                    subtitle="Today's Nutrition Tip"
-                    color="#95C99B"
-                    icon={faAppleWhole}
-                    onPress={() => {}}
-                  />
-                  <TipCard
-                    title={dailyTips.productivity}
-                    subtitle="Today's Productivity Tip"
-                    color="#9BB5C9"
-                    icon={faBrain}
-                    onPress={() => {}}
-                  />
-                </View>
-              </View>
-            )}
 
             <View style={styles.sectionContainer}>
               <Subheading>Todays Workout</Subheading>
@@ -186,6 +165,26 @@ export default function HomeScreen() {
               />
             </View>
 
+            {/* Daily Tips Section */}
+            {currentPhase && dailyTips && (
+              <View style={styles.sectionContainer}>
+                <View style={styles.tipsContainer}>
+                  <TipCard
+                    nutritionTip={dailyTips.nutrition}
+                    productivityTip={dailyTips.productivity}
+                    subtitle={`Today's ${
+                      currentPhase.charAt(0).toUpperCase() +
+                      currentPhase.slice(1)
+                    } Phase Tips`}
+                    color="#8FA8BA"
+                    nutritionIcon={faAppleWhole}
+                    productivityIcon={faBrain}
+                    onPress={() => {}}
+                  />
+                </View>
+              </View>
+            )}
+
             {/* How are you feeling today section */}
             <View style={styles.sectionContainer}>
               <Subheading>How are you feeling today?</Subheading>
@@ -200,7 +199,11 @@ export default function HomeScreen() {
                           ? logging.dayLog(selectedDate)?.period?.flow || "-"
                           : "Not logged"
                       }
-                      subtitle={"-"}
+                      subtitle={
+                        (logging.getPeriodDay(selectedDate) ?? -1) >= 0
+                          ? `Day ${logging.getPeriodDay(selectedDate) ?? 0 + 1}`
+                          : "-"
+                      }
                       status={
                         logging.dayLog(selectedDate)?.period
                           ? "completed"

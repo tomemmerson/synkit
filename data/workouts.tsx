@@ -45,6 +45,14 @@ export type WorkoutID = keyof typeof workoutLibrary;
 
 export type Plan = Record<string, WorkoutPlan>;
 
+// Helper function to get workout image from first exercise
+export const getWorkoutImage = (workout: Workout) => {
+  if (workout?.exercises?.[0]?.icon && workout.exercises[0].icon !== "") {
+    return workout.exercises[0].icon;
+  }
+  return require("@/assets/images/movements/moving-workout.png"); // fallback
+};
+
 // Central workout library with memorable names
 export const workoutLibrary: Record<string, Workout> = {
   // Walking workouts

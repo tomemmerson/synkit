@@ -21,7 +21,7 @@ import { SheetManager } from "react-native-actions-sheet";
 import Heading from "@/components/Heading";
 import Subheading from "@/components/Subheading";
 import { useLogging } from "@/data/logging";
-import { workoutLibrary } from "@/data/workouts";
+import { getWorkoutImage, workoutLibrary } from "@/data/workouts";
 import { router } from "expo-router";
 import { moodIDToIcon } from "@/components/sheets/Mood";
 import { getDailyTips, type Phase } from "@/data/tips";
@@ -162,6 +162,7 @@ export default function HomeScreen() {
                 duration={todaysWorkout.estimatedDuration || ""}
                 exercises={todaysWorkout.exercises.length}
                 complete={workoutComplete}
+                image={getWorkoutImage(todaysWorkout)}
               />
             </View>
 

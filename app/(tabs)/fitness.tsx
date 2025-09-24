@@ -17,7 +17,7 @@ import { useLogging } from "@/data/logging";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faRunning, faTimer } from "@fortawesome/pro-regular-svg-icons";
 import { faSpinnerScale } from "@fortawesome/pro-solid-svg-icons";
-import { plans, workoutLibrary } from "@/data/workouts";
+import { getWorkoutImage, workoutLibrary } from "@/data/workouts";
 
 export default function Fitness() {
   const logging = useLogging();
@@ -78,6 +78,7 @@ export default function Fitness() {
                   duration={todaysWorkout.estimatedDuration || ""}
                   exercises={todaysWorkout.exercises.length}
                   complete={workoutComplete}
+                  image={getWorkoutImage(todaysWorkout)}
                 />
                 {!workoutComplete && (
                   <Button
@@ -153,6 +154,54 @@ export default function Fitness() {
             <Subheading>
               Other {logging.calculateCurrentPhase()} workouts
             </Subheading>
+            {(() => {
+              const allWorkouts = logging.getCurrentWorkouts(false); // Get all workouts including completed
+              const otherWorkouts =
+                allWorkouts?.filter(
+                  (workout) => workout.id !== todaysWorkout.id
+                ) || [];
+
+              if (otherWorkouts.length === 0) {
+                return (
+                  <Paragraph style={{ fontStyle: "italic", color: "#A184AB" }}>
+                    No other workouts available for this phase.
+                  </Paragraph>
+                );
+              }
+
+              const mapDifficulty = (
+                difficulty?: "Medium" | "High" | "Low"
+              ): "Medium" | "Easy" | "Hard" => {
+                switch (difficulty) {
+                  case "High":
+                    return "Hard";
+                  case "Low":
+                    return "Easy";
+                  case "Medium":
+                  default:
+                    return "Medium";
+                }
+              };
+
+              return otherWorkouts.map((workout) => (
+                <View key={workout.id} style={styles.otherWorkoutItem}>
+                  <WorkoutCard
+                    title={workout.name}
+                    difficulty={mapDifficulty(workout.difficulty)}
+                    onPress={() => {
+                      router.push({
+                        pathname: "/workout",
+                        params: { workoutID: workout.id },
+                      });
+                    }}
+                    duration={workout.estimatedDuration || ""}
+                    exercises={workout.exercises.length}
+                    complete={false}
+                    image={getWorkoutImage(workout)}
+                  />
+                </View>
+              ));
+            })()}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -204,5 +253,8 @@ const styles = StyleSheet.create({
   phaseItemLabel: {
     fontSize: 16,
     color: "#A184AB",
+  },
+  otherWorkoutItem: {
+    marginBottom: 12,
   },
 });

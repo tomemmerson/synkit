@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ImageSourcePropType,
+} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBolt, faPlus, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import { faPartyHorn } from "@fortawesome/pro-regular-svg-icons";
@@ -11,6 +18,7 @@ interface WorkoutCardProps {
   exercises: number;
   onPress?: () => void;
   complete?: boolean;
+  image?: ImageSourcePropType;
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({
@@ -20,6 +28,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   exercises,
   onPress,
   complete = false,
+  image,
 }) => {
   const getDifficultyDots = (level: string) => {
     const totalDots = 3;
@@ -93,7 +102,9 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
 
       <View style={styles.imageContainer}>
         <Image
-          source={require("../assets/images/movements/moving-workout.png")}
+          source={
+            image || require("../assets/images/movements/moving-workout.png")
+          }
           style={styles.workoutImage}
           resizeMode="contain"
         />

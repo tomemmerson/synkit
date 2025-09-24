@@ -52,6 +52,44 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   // State for managing weeks
   const [weeks, setWeeks] = useState<WeekData[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [currentScrollIndex, setCurrentScrollIndex] = useState(
+    Math.floor(WINDOW_SIZE / 2)
+  );
+
+  // Helper function to scroll to previous week
+  const scrollToPreviousWeek = useCallback(() => {
+    if (!scrollViewRef.current) return;
+
+    const currentIndex = currentScrollIndex;
+    const previousIndex = Math.max(0, currentIndex - 1);
+
+    if (previousIndex !== currentIndex) {
+      scrollViewRef.current.scrollTo({
+        x: previousIndex * weekWidth,
+        animated: true,
+      });
+      setCurrentScrollIndex(previousIndex);
+      lastScrollIndexRef.current = previousIndex;
+    }
+  }, [weekWidth, currentScrollIndex]);
+
+  // Helper function to scroll to next week
+  const scrollToNextWeek = useCallback(() => {
+    if (!scrollViewRef.current) return;
+
+    const currentIndex = currentScrollIndex;
+    const maxIndex = weeks.length - 1;
+    const nextIndex = Math.min(maxIndex, currentIndex + 1);
+
+    if (nextIndex !== currentIndex) {
+      scrollViewRef.current.scrollTo({
+        x: nextIndex * weekWidth,
+        animated: true,
+      });
+      setCurrentScrollIndex(nextIndex);
+      lastScrollIndexRef.current = nextIndex;
+    }
+  }, [weekWidth, weeks.length, currentScrollIndex]);
 
   // Helper function to format date for display
   const formatSelectedDate = (date: Date) => {
@@ -132,6 +170,7 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
         animated: false,
       });
       lastScrollIndexRef.current = currentWeekIndex;
+      setCurrentScrollIndex(currentWeekIndex);
     }
   }, [isInitialized, weekWidth, WINDOW_SIZE]);
 
@@ -192,12 +231,14 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
             lastScrollIndexRef.current = Math.round(
               adjustedScrollPosition / weekWidth
             );
+            setCurrentScrollIndex(lastScrollIndexRef.current);
             isAdjustingScrollRef.current = false;
           }
         }, 10);
       } else {
         // Just update the ref for normal scrolling within the safe range
         lastScrollIndexRef.current = currentIndex;
+        setCurrentScrollIndex(currentIndex);
       }
     },
     [weekWidth, generateWeekData, WINDOW_SIZE]
@@ -211,10 +252,13 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
             if (onClick) {
               onClick(todaysDate);
               // scroll to the current week
+              const targetIndex = WINDOW_SIZE - 1;
               scrollViewRef.current?.scrollTo({
-                x: (WINDOW_SIZE - 1) * weekWidth,
+                x: targetIndex * weekWidth,
                 animated: true,
               });
+              setCurrentScrollIndex(targetIndex);
+              lastScrollIndexRef.current = targetIndex;
             }
           }}
         >
@@ -223,11 +267,38 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
           </Text>
         </Pressable>
         <View style={styles.dateNavigation}>
-          <TouchableOpacity style={styles.navButton}>
-            <FontAwesomeIcon icon={faChevronLeft} size={16} color="#9294AC" />
+          <TouchableOpacity
+            style={[
+              styles.navButton,
+              currentScrollIndex === 0 && styles.navButtonDisabled,
+            ]}
+            onPress={scrollToPreviousWeek}
+            activeOpacity={currentScrollIndex === 0 ? 1 : 0.7}
+            disabled={currentScrollIndex === 0}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={16}
+              color={currentScrollIndex === 0 ? "#C0C0C0" : "#9294AC"}
+            />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navButton}>
-            <FontAwesomeIcon icon={faChevronRight} size={16} color="#9294AC" />
+          <TouchableOpacity
+            style={[
+              styles.navButton,
+              currentScrollIndex >= weeks.length - 1 &&
+                styles.navButtonDisabled,
+            ]}
+            onPress={scrollToNextWeek}
+            activeOpacity={currentScrollIndex >= weeks.length - 1 ? 1 : 0.7}
+            disabled={currentScrollIndex >= weeks.length - 1}
+          >
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              size={16}
+              color={
+                currentScrollIndex >= weeks.length - 1 ? "#C0C0C0" : "#9294AC"
+              }
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -330,6 +401,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0F0F0",
     alignItems: "center",
     justifyContent: "center",
+  },
+  navButtonDisabled: {
+    backgroundColor: "#F8F8F8",
+    opacity: 0.6,
   },
   calendarScroll: {
     flexGrow: 0,

@@ -150,7 +150,9 @@ export default function Fitness() {
             </Card>
           </View>
           <View style={styles.section}>
-            <Subheading>Other *luteal workouts</Subheading>
+            <Subheading>
+              Other {logging.calculateCurrentPhase()} workouts
+            </Subheading>
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -1,5 +1,10 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import {
+  NativeTabs,
+  Icon,
+  Label,
+  Badge,
+} from "expo-router/unstable-native-tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faHome,
@@ -13,45 +18,26 @@ import "@/components/sheets/sheets";
 export default function TabLayout() {
   return (
     <SheetProvider>
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: "#614178",
-          tabBarInactiveTintColor: "#9294AC",
-          headerShown: false,
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: "500",
-          },
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesomeIcon icon={faHome} size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="fitness"
-          options={{
-            title: "Fitness",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesomeIcon icon={faDumbbell} size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <FontAwesomeIcon icon={faEllipsis} size={size} color={color} />
-            ),
-          }}
-        />
-      </Tabs>
+      <NativeTabs>
+        <NativeTabs.Trigger name="index">
+          <Label>Home</Label>
+          <Icon
+            sf={{ default: "house", selected: "house.fill" }}
+            selectedColor={"#614178"}
+          />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="fitness">
+          <Label>Fitness</Label>
+          <Icon
+            sf={{ default: "dumbbell", selected: "dumbbell.fill" }}
+            selectedColor={"#614178"}
+          />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="settings">
+          <Label>Settings</Label>
+          <Icon sf={"ellipsis"} selectedColor={"#614178"} />
+        </NativeTabs.Trigger>
+      </NativeTabs>
     </SheetProvider>
   );
 }

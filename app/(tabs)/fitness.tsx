@@ -169,24 +169,32 @@ export default function Fitness() {
                 );
               }
 
-              return otherWorkouts.map((workout) => (
-                <View key={workout.id} style={styles.otherWorkoutItem}>
-                  <WorkoutCard
-                    title={workout.name}
-                    difficulty={workout.difficulty || "Medium"}
-                    onPress={() => {
-                      router.push({
-                        pathname: "/workout",
-                        params: { workoutID: workout.id },
-                      });
-                    }}
-                    duration={workout.estimatedDuration || ""}
-                    exercises={workout.exercises.length}
-                    complete={false}
-                    image={getWorkoutImage(workout)}
-                  />
-                </View>
-              ));
+              return otherWorkouts.map((workout) => {
+                // Check if this workout was completed today
+                const isCompleted = completedToday.some(
+                  (completion) => completion.workoutId === workout.id
+                );
+
+                return (
+                  <View key={workout.id} style={styles.otherWorkoutItem}>
+                    <WorkoutCard
+                      title={workout.name}
+                      difficulty={workout.difficulty || "Medium"}
+                      onPress={() => {
+                        !isCompleted &&
+                          router.push({
+                            pathname: "/workout",
+                            params: { workoutID: workout.id },
+                          });
+                      }}
+                      duration={workout.estimatedDuration || ""}
+                      exercises={workout.exercises.length}
+                      complete={isCompleted}
+                      image={getWorkoutImage(workout)}
+                    />
+                  </View>
+                );
+              });
             })()}
           </View>
           <View style={{ marginBottom: 60 }} />

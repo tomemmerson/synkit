@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import ActionSheet, { SheetManager } from "react-native-actions-sheet";
+import ActionSheet, {
+  SheetManager,
+  ActionSheetRef,
+} from "react-native-actions-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 
@@ -12,8 +15,11 @@ type Props = {
 };
 
 function BaseSheet({ children, onSelect, title, buttonName }: Props) {
+  const actionSheetRef = useRef<ActionSheetRef>(null);
+
   return (
     <ActionSheet
+      ref={actionSheetRef}
       gestureEnabled
       containerStyle={{
         borderTopLeftRadius: 30,
@@ -28,7 +34,7 @@ function BaseSheet({ children, onSelect, title, buttonName }: Props) {
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.closeButton}
-            onPress={() => SheetManager.hideAll()}
+            onPress={() => actionSheetRef.current?.hide()}
           >
             <FontAwesomeIcon icon={faXmark} size={20} color="#5F2E71" />
           </TouchableOpacity>

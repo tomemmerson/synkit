@@ -63,7 +63,7 @@ function MoodSheet(props: SheetProps<"mood-sheet">) {
   const { dayLog, logMood } = useLogging();
 
   const defaultMood =
-    dayLog(props.payload?.selectedDate || new Date())?.mood || "sad";
+    dayLog(props.payload?.selectedDate || new Date())?.mood || "happy";
 
   const [selectedMood, setSelectedMood] = useState<string>(defaultMood);
 

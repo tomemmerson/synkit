@@ -88,6 +88,20 @@ export default function HomeScreen() {
     }
   }
 
+  // Check if selected date is today
+  const isSelectedDateToday =
+    selectedDate.toDateString() === new Date().toDateString();
+
+  // Get workout completions for selected date
+  const selectedDateCompletions = logging.getWorkoutCompletions(selectedDate);
+  const hasWorkoutOnSelectedDate = selectedDateCompletions.length > 0;
+
+  let selectedDateWorkout = null;
+  if (hasWorkoutOnSelectedDate) {
+    const workoutId = selectedDateCompletions[0].workoutId;
+    selectedDateWorkout = workoutLibrary[workoutId];
+  }
+
   // Get current phase and daily tips
   const currentPhase = logging.calculateCurrentPhase(selectedDate) as Phase;
   const dailyTips = currentPhase
@@ -135,39 +149,43 @@ export default function HomeScreen() {
             onClick={(date) => setSelectedDate(date)}
           />
           <View style={styles.contentPadding}>
-            {/* Today's Workout Section */}
-            <View
-              style={{
-                width: "100%",
-                height: 1,
-                backgroundColor: "#E3E3E3",
-                marginHorizontal: 16,
-                marginBottom: 32,
-                marginTop: 0,
-              }}
-            />
+            {/* Today's Workout Section - Only show when viewing today */}
+            {isSelectedDateToday && (
+              <>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 1,
+                    backgroundColor: "#E3E3E3",
+                    marginHorizontal: 16,
+                    marginBottom: 32,
+                    marginTop: 0,
+                  }}
+                />
 
-            <View style={styles.sectionContainer}>
-              <Subheading>Todays Workout</Subheading>
-              <WorkoutCard
-                title={todaysWorkout.name}
-                difficulty="Medium"
-                onPress={() => {
-                  !workoutComplete &&
-                    router.push({
-                      pathname: "/workout",
-                      params: { workoutID: todaysWorkout.id },
-                    });
-                }}
-                duration={todaysWorkout.estimatedDuration || ""}
-                exercises={todaysWorkout.exercises.length}
-                complete={workoutComplete}
-                image={getWorkoutImage(todaysWorkout)}
-              />
-            </View>
+                <View style={styles.sectionContainer}>
+                  <Subheading>Todays Workout</Subheading>
+                  <WorkoutCard
+                    title={todaysWorkout.name}
+                    difficulty="Medium"
+                    onPress={() => {
+                      !workoutComplete &&
+                        router.push({
+                          pathname: "/workout",
+                          params: { workoutID: todaysWorkout.id },
+                        });
+                    }}
+                    duration={todaysWorkout.estimatedDuration || ""}
+                    exercises={todaysWorkout.exercises.length}
+                    complete={workoutComplete}
+                    image={getWorkoutImage(todaysWorkout)}
+                  />
+                </View>
+              </>
+            )}
 
-            {/* Daily Tips Section */}
-            {currentPhase && dailyTips && (
+            {/* Daily Tips Section - Only show when viewing today */}
+            {isSelectedDateToday && currentPhase && dailyTips && (
               <View style={styles.sectionContainer}>
                 <View style={styles.tipsContainer}>
                   <TipCard
@@ -253,9 +271,17 @@ export default function HomeScreen() {
                 <View style={styles.fullCard}>
                   <StatusCard
                     type="Workout"
-                    title="Logged"
-                    subtitle="Moderate"
-                    status="add"
+                    title={
+                      hasWorkoutOnSelectedDate
+                        ? selectedDateWorkout?.name || "Workout"
+                        : "Not logged"
+                    }
+                    subtitle={
+                      hasWorkoutOnSelectedDate
+                        ? selectedDateWorkout?.difficulty || "Medium"
+                        : "-"
+                    }
+                    status={hasWorkoutOnSelectedDate ? "completed" : "add"}
                     color="#ECCD97"
                     onPress={() => console.log("Workout log pressed")}
                     icon={faPersonWalking}
@@ -303,6 +329,7 @@ const styles = StyleSheet.create({
   contentPadding: {
     paddingTop: 20,
     paddingHorizontal: 16,
+    paddingBottom: 80,
   },
   sectionContainer: {
     marginBottom: 24,

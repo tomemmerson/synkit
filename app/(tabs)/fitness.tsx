@@ -189,6 +189,7 @@ export default function Fitness() {
               ));
             })()}
           </View>
+          <View style={{ marginBottom: 60 }} />
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -212,8 +213,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   section: {
-    marginTop: 20,
-    marginBottom: 50,
+    marginTop: 10,
+    marginBottom: 20,
     paddingHorizontal: 16,
   },
   phases: {
@@ -241,6 +242,6 @@ const styles = StyleSheet.create({
     color: "#A184AB",
   },
   otherWorkoutItem: {
-    marginBottom: 12,
+    marginBottom: 0,
   },
 });

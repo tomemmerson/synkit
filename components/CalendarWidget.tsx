@@ -38,7 +38,7 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
 }) => {
   const todaysDate = new Date();
 
-  const { dayLog } = useLogging();
+  const { dayLog, getWorkoutCompletions } = useLogging();
 
   // Window size - total number of weeks to keep loaded
   const WINDOW_SIZE = 6;
@@ -244,24 +244,28 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
     [weekWidth, generateWeekData, WINDOW_SIZE]
   );
 
+  // Check if selected date is not today
+  const isSelectedDateToday =
+    selectedDate.toDateString() === todaysDate.toDateString();
+
+  const handleGoToToday = () => {
+    if (onClick) {
+      onClick(todaysDate);
+      // scroll to the current week
+      const targetIndex = WINDOW_SIZE - 1;
+      scrollViewRef.current?.scrollTo({
+        x: targetIndex * weekWidth,
+        animated: true,
+      });
+      setCurrentScrollIndex(targetIndex);
+      lastScrollIndexRef.current = targetIndex;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
-        <Pressable
-          onPress={() => {
-            if (onClick) {
-              onClick(todaysDate);
-              // scroll to the current week
-              const targetIndex = WINDOW_SIZE - 1;
-              scrollViewRef.current?.scrollTo({
-                x: targetIndex * weekWidth,
-                animated: true,
-              });
-              setCurrentScrollIndex(targetIndex);
-              lastScrollIndexRef.current = targetIndex;
-            }
-          }}
-        >
+        <Pressable onPress={handleGoToToday}>
           <Text style={styles.headerDateText}>
             {formatSelectedDate(selectedDate)}
           </Text>
@@ -359,10 +363,19 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                 </View>
                 <View style={styles.dotsContainer}>
                   {dayLog(item.fullDate)?.mood && (
-                    <View style={[styles.dot, { backgroundColor: "blue" }]} />
+                    <View
+                      style={[styles.dot, { backgroundColor: "#AC79BB" }]}
+                    />
                   )}
                   {dayLog(item.fullDate)?.period && (
-                    <View style={[styles.dot, { backgroundColor: "red" }]} />
+                    <View
+                      style={[styles.dot, { backgroundColor: "#E29A96" }]}
+                    />
+                  )}
+                  {getWorkoutCompletions(item.fullDate).length > 0 && (
+                    <View
+                      style={[styles.dot, { backgroundColor: "#ECCD97" }]}
+                    />
                   )}
                 </View>
               </TouchableOpacity>
@@ -370,6 +383,15 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
           </View>
         ))}
       </ScrollView>
+
+      {!isSelectedDateToday && (
+        <TouchableOpacity
+          style={styles.goToTodayButton}
+          onPress={handleGoToToday}
+        >
+          <Text style={styles.goToTodayButtonText}>Go to Today</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -463,6 +485,20 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
+  },
+  goToTodayButton: {
+    backgroundColor: "#614178",
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  goToTodayButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

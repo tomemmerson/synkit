@@ -13,7 +13,7 @@ import { faPartyHorn } from "@fortawesome/pro-regular-svg-icons";
 
 interface WorkoutCardProps {
   title: string;
-  difficulty: "Easy" | "Medium" | "Hard";
+  difficulty: "Low" | "Medium" | "High";
   duration: string;
   exercises: number;
   onPress?: () => void;
@@ -35,13 +35,13 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
     let activeDots = 0;
 
     switch (level) {
-      case "Easy":
+      case "Low":
         activeDots = 1;
         break;
       case "Medium":
         activeDots = 2;
         break;
-      case "Hard":
+      case "High":
         activeDots = 3;
         break;
     }
@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   workoutImage: {
-    height: 150,
-    top: 30,
+    height: 160,
+    top: 10,
     right: 15,
   },
   backgroundBlob: {

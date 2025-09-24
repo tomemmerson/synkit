@@ -67,7 +67,7 @@ export default function Fitness() {
               <>
                 <WorkoutCard
                   title={todaysWorkout.name}
-                  difficulty="Medium"
+                  difficulty={todaysWorkout.difficulty || "Medium"}
                   onPress={() => {
                     !workoutComplete &&
                       router.push({
@@ -169,25 +169,11 @@ export default function Fitness() {
                 );
               }
 
-              const mapDifficulty = (
-                difficulty?: "Medium" | "High" | "Low"
-              ): "Medium" | "Easy" | "Hard" => {
-                switch (difficulty) {
-                  case "High":
-                    return "Hard";
-                  case "Low":
-                    return "Easy";
-                  case "Medium":
-                  default:
-                    return "Medium";
-                }
-              };
-
               return otherWorkouts.map((workout) => (
                 <View key={workout.id} style={styles.otherWorkoutItem}>
                   <WorkoutCard
                     title={workout.name}
-                    difficulty={mapDifficulty(workout.difficulty)}
+                    difficulty={workout.difficulty || "Medium"}
                     onPress={() => {
                       router.push({
                         pathname: "/workout",

@@ -67,7 +67,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/walking.png"),
       },
     ],
-    difficulty: "Low" as const,
+    difficulty: "Low",
     estimatedDuration: "30 mins",
   },
 

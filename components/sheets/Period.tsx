@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import ActionSheet, {
   SheetManager,
   SheetProps,
@@ -127,25 +127,25 @@ function PeriodSheet(props: SheetProps<"mood-sheet">) {
   const [selectedPeriod, setSelectedPeriod] = useState<Flow | undefined>(
     defaultFlow
   );
-  const [selectedSymptoms, setSelectedSymptoms] = useState<Symptoms[] | []>(
-    defaultSymptoms
-  );
+  const [selectedSymptoms, setSelectedSymptoms] =
+    useState<Symptoms[]>(defaultSymptoms);
 
   const handlePeriodSelect = (periodId: any) => {
     setSelectedPeriod(periodId);
   };
 
-  const handleSymptomSelect = (symptomId: Symptoms) => {
-    if (selectedSymptoms.includes(symptomId)) {
+  const handleSymptomSelect = (symptomId: string) => {
+    const typedSymptomId = symptomId as Symptoms;
+    if (selectedSymptoms.includes(typedSymptomId)) {
       setSelectedSymptoms((prev) =>
-        prev.filter((symptom) => symptom !== symptomId)
+        prev.filter((symptom) => symptom !== typedSymptomId)
       );
     } else {
-      setSelectedSymptoms((prev) => [...prev, symptomId]);
+      setSelectedSymptoms((prev) => [...prev, typedSymptomId]);
     }
   };
 
-  const handleLogPeriod = () => {
+  const handleLogPeriod = async () => {
     if (!props.payload?.selectedDate) {
       console.error("No date selected for mood logging.");
       return;
@@ -156,12 +156,80 @@ function PeriodSheet(props: SheetProps<"mood-sheet">) {
       return;
     }
 
+    // Get previous phase before logging the new period
+    const previousPhase = logging.calculateCurrentPhase(
+      props.payload.selectedDate
+    );
+
+    // Log the period first
     logging.logPeriod(
       props.payload.selectedDate,
       selectedPeriod,
       selectedSymptoms
     );
-    SheetManager.hide("period-sheet");
+
+    // Get new phase after logging
+    const newPhase = logging.calculateCurrentPhase(props.payload.selectedDate);
+
+    // Check if we should prompt for level progression
+    const shouldPromptLevelUp = await logging.checkForNewCycleAndPromptLevelUp(
+      props.payload.selectedDate,
+      selectedPeriod,
+      previousPhase,
+      newPhase
+    );
+
+    if (shouldPromptLevelUp) {
+      const currentPlan = logging.currentWorkoutPlan;
+      const currentLevel = logging.currentWorkoutLevel;
+      const nextLevel = logging.getNextWorkoutLevel(
+        currentPlan!,
+        currentLevel!
+      );
+
+      if (nextLevel) {
+        const currentPlan = logging.getCurrentPlan();
+        const currentLevelName = currentPlan?.name || "Current Level";
+        const nextLevelName = logging.getWorkoutLevelName(
+          logging.currentWorkoutPlan!,
+          nextLevel
+        );
+
+        Alert.alert(
+          "New Cycle Started!",
+          `You've completed your ${currentLevelName} plan. Would you like to progress to the next level or restart your current level?`,
+          [
+            {
+              text: "Restart Current Level",
+              style: "cancel",
+              onPress: () => {
+                SheetManager.hide("period-sheet");
+              },
+            },
+            {
+              text: "Move to Next Level",
+              onPress: () => {
+                logging.setWorkoutLevel(nextLevel);
+                Alert.alert(
+                  "Level Up!",
+                  `Congratulations! You've been moved to ${nextLevelName}. Your new workouts will be available based on your current cycle phase.`,
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => SheetManager.hide("period-sheet"),
+                    },
+                  ]
+                );
+              },
+            },
+          ]
+        );
+      } else {
+        SheetManager.hide("period-sheet");
+      }
+    } else {
+      SheetManager.hide("period-sheet");
+    }
   };
 
   return (

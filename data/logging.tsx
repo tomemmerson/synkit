@@ -82,6 +82,17 @@ export interface SettingsActions {
   isWorkoutComplete: (workout: Workout, days?: number) => boolean;
   clearWorkoutHistory: () => void;
   clearPeriodLogs: () => void;
+  getNextWorkoutLevel: (
+    currentPlan: WorkoutPlanType,
+    currentLevel: WorkoutLevel
+  ) => WorkoutLevel | null;
+  checkForNewCycleAndPromptLevelUp: (
+    date: Date,
+    flow: Flow,
+    previousPhase: PhaseType | undefined,
+    newPhase: PhaseType | undefined
+  ) => Promise<boolean>;
+  getWorkoutLevelName: (plan: WorkoutPlanType, level: WorkoutLevel) => string;
 }
 
 export const useLogging = create<
@@ -255,6 +266,17 @@ export const useLogging = create<
         const diffTime = today.getTime() - lastPeriodStart.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
+        // Check if user has logged flow on the selected date
+        const dayData = get().dayLog(today);
+        const hasFlowToday =
+          dayData?.period?.flow && dayData.period.flow !== "none";
+
+        // If user has logged flow today, they're still in menstrual phase
+        if (hasFlowToday) {
+          return "menstrual";
+        }
+
+        // Otherwise, use the standard day-based calculation
         if (diffDays < 5) return "menstrual"; // First 5 days
         if (diffDays < 14) return "follicular"; // Days 6-13
         if (diffDays < 20) return "ovulation"; // Days 14-19
@@ -463,6 +485,68 @@ export const useLogging = create<
             days: updatedDays,
           };
         });
+      },
+      getNextWorkoutLevel: (
+        currentPlan: WorkoutPlanType,
+        currentLevel: WorkoutLevel
+      ) => {
+        if (currentPlan === "running") {
+          const levels = [
+            "beginner",
+            "intermediateBeginner",
+            "intermediateAdvanced",
+            "advanced",
+          ];
+          const currentIndex = levels.indexOf(currentLevel);
+          if (currentIndex >= 0 && currentIndex < levels.length - 1) {
+            return levels[currentIndex + 1] as WorkoutLevel;
+          }
+        } else if (currentPlan === "strength") {
+          const levels = ["beginner", "intermediate", "advanced"];
+          const currentIndex = levels.indexOf(currentLevel);
+          if (currentIndex >= 0 && currentIndex < levels.length - 1) {
+            return levels[currentIndex + 1] as WorkoutLevel;
+          }
+        }
+        return null; // Already at max level or invalid plan/level
+      },
+      checkForNewCycleAndPromptLevelUp: async (
+        date: Date,
+        flow: Flow,
+        previousPhase: PhaseType | undefined,
+        newPhase: PhaseType | undefined
+      ) => {
+        // Only check if we're transitioning to menstrual phase with actual flow
+        if (newPhase !== "menstrual" || flow === "none" || !flow) {
+          return false;
+        }
+
+        // Check if we were previously in a different phase (indicating a new cycle)
+        if (previousPhase && previousPhase !== "menstrual") {
+          const currentPlan = get().currentWorkoutPlan;
+          const currentLevel = get().currentWorkoutLevel;
+
+          if (currentPlan && currentLevel) {
+            const nextLevel = get().getNextWorkoutLevel(
+              currentPlan,
+              currentLevel
+            );
+            if (nextLevel) {
+              return true; // Indicate that level progression should be prompted
+            }
+          }
+        }
+        return false;
+      },
+      getWorkoutLevelName: (plan: WorkoutPlanType, level: WorkoutLevel) => {
+        if (plan === "running") {
+          const plans = runPlans as any;
+          return plans[level]?.name || level;
+        } else if (plan === "strength") {
+          const plans = strengthPlans as any;
+          return plans[level]?.name || level;
+        }
+        return level;
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

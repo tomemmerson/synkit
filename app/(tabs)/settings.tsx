@@ -1,11 +1,35 @@
 import { useLogging } from "@/data/logging";
 import Button from "@/components/Button";
-import React from "react";
-import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const logging = useLogging();
+  const [nameInput, setNameInput] = useState(logging.name || "");
+  const [isEditingName, setIsEditingName] = useState(false);
+
+  const handleSaveName = () => {
+    if (nameInput.trim()) {
+      logging.setName(nameInput.trim());
+      setIsEditingName(false);
+      Alert.alert("Success", "Your name has been updated.");
+    } else {
+      Alert.alert("Error", "Please enter a valid name.");
+    }
+  };
+
+  const handleCancelEditName = () => {
+    setNameInput(logging.name || "");
+    setIsEditingName(false);
+  };
 
   const handleClearWorkoutHistory = () => {
     Alert.alert(
@@ -56,6 +80,43 @@ export default function SettingsScreen() {
         contentContainerStyle={styles.content}
       >
         <Text style={styles.title}>Settings</Text>
+
+        {isEditingName ? (
+          <View style={styles.editingContainer}>
+            <TextInput
+              style={styles.nameInput}
+              value={nameInput}
+              onChangeText={setNameInput}
+              placeholder="Enter your name"
+              placeholderTextColor="#9294AC"
+              maxLength={50}
+              autoFocus
+              onSubmitEditing={handleSaveName}
+              returnKeyType="done"
+            />
+            <View style={styles.nameButtonRow}>
+              <View style={styles.nameButtonContainer}>
+                <Button
+                  title="Cancel"
+                  onPress={handleCancelEditName}
+                  variant="secondary"
+                />
+              </View>
+              <View style={styles.nameButtonContainer}>
+                <Button title="Save" onPress={handleSaveName} />
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.nameBubbleContainer}>
+            <Text
+              style={styles.nameBubble}
+              onPress={() => setIsEditingName(true)}
+            >
+              {logging.name || "Tap to set name"}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Workout Data</Text>
@@ -144,5 +205,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#9294AC",
     textAlign: "center",
+  },
+  nameBubbleContainer: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  nameBubble: {
+    backgroundColor: "#614178",
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    textAlign: "center",
+    overflow: "hidden",
+  },
+  editingContainer: {
+    marginBottom: 32,
+    paddingHorizontal: 16,
+  },
+  nameInput: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#2B2E46",
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+    textAlign: "center",
+  },
+  nameButtonRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  nameButtonContainer: {
+    flex: 1,
   },
 });

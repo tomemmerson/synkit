@@ -76,7 +76,9 @@ export default function SettingsScreen() {
   };
 
   const handlePrivacyPolicy = () => {
-    Linking.openURL("https://google.com").catch(() => {
+    Linking.openURL(
+      "https://www.privacypolicies.com/live/5297466b-1bb6-4ca3-abd4-4d2e692af0df"
+    ).catch(() => {
       Alert.alert("Error", "Could not open privacy policy link.");
     });
   };

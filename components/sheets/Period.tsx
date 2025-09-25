@@ -197,10 +197,10 @@ function PeriodSheet(props: SheetProps<"mood-sheet">) {
 
         Alert.alert(
           "New Cycle Started!",
-          `You've completed your ${currentLevelName} plan. Would you like to progress to the next level or restart your current level?`,
+          `You've completed your ${currentLevelName} plan. Would you like to progress to the next level or continue your current level?`,
           [
             {
-              text: "Restart Current Level",
+              text: "Continue current plan",
               style: "cancel",
               onPress: () => {
                 SheetManager.hide("period-sheet");

@@ -288,12 +288,12 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "90s run/ 90s walk",
         description: "90s run/ 90s walk",
-        icon: "",
+        icon: require("@/assets/images/movements/fast-walking.png"),
       },
       {
         name: "3min run/ 3min walk",
         description: "3min run/ 3min walk - repeat both 3 times",
-        icon: "",
+        icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
   },
@@ -306,12 +306,12 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "90sec run/ 90sec walk",
         description: "90sec run/ 90sec walk",
-        icon: "",
+        icon: require("@/assets/images/movements/fast-walking.png"),
       },
       {
         name: "3min run/ 3min walk",
         description: "3min run/ 3min walk - repeat both 3 times",
-        icon: "",
+        icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
   },
@@ -324,32 +324,32 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "BW squats",
         description: "12 reps/ 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bw-squats.png"),
       },
       {
         name: "BW lunges",
         description: "12 reps each side / 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bw-lunges.png"),
       },
       {
         name: "Calf Raises",
         description: "12 reps each side/ 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/calf-raises.png"),
       },
       {
         name: "Shoulder taps",
         description: "16 reps/ 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/shoulder-taps.png"),
       },
       {
         name: "Plank",
         description: "45s/ 2 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/plank.png"),
       },
       {
         name: "Bird Dog",
         description: "16 reps x 2sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bird-dog.png"),
       },
     ],
   },
@@ -362,17 +362,17 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Run 3 min/ walk 3 mins",
         description: "Run 3 min/ walk 3 mins",
-        icon: "",
+        icon: require("@/assets/images/movements/walking.png"),
       },
       {
         name: "Run 5mins/ walk 5mins",
         description: "Run 5mins/ walk 5mins",
-        icon: "",
+        icon: require("@/assets/images/movements/walking.png"),
       },
       {
         name: "Run 5mins/ walk 5mins",
         description: "Run 5mins/ walk 5mins",
-        icon: "",
+        icon: require("@/assets/images/movements/walking.png"),
       },
     ],
   },
@@ -385,7 +385,7 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Run/Walk",
         description: "2min run/ 2 min walk - repeat 6 times",
-        icon: "",
+        icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
   },

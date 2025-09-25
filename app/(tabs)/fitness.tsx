@@ -122,13 +122,46 @@ export default function Fitness() {
             </Card>
           </View>
           <View style={styles.section}>
-            <Subheading>Workout plan</Subheading>
+            <Subheading>My Workouts</Subheading>
             <Card
               style={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 12,
+                }}
+              >
+                <Subheading style={{ marginBottom: 0, flexWrap: "wrap" }}>
+                  {(() => {
+                    const recentHistory = logging.getWorkoutHistory(7);
+                    return `${recentHistory.length} workouts`;
+                  })()}
+                </Subheading>
+                <Paragraph>Past 7 days</Paragraph>
+              </View>
+
+              <Button
+                title="View All"
+                variant="secondary"
+                onPress={() => router.push("/workout-history")}
+              />
+            </Card>
+            <Card
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 10,
               }}
             >
               <View

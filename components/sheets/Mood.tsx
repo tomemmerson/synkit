@@ -36,7 +36,7 @@ export const moodOptions: (SelectionOption & { id: Mood })[] = [
     id: "overwhelmed",
     icon: {
       icon: faDizzy,
-      color: "#5F2E71",
+      color: "#D38DA9",
     },
     label: "Overwhelmed",
   },
@@ -44,7 +44,7 @@ export const moodOptions: (SelectionOption & { id: Mood })[] = [
     id: "angry",
     icon: {
       icon: faAngry,
-      color: "#5F2E71",
+      color: "#CB9874",
     },
     label: "Angry",
   },

@@ -8,6 +8,8 @@ import {
   Alert,
   ScrollView,
   TextInput,
+  Linking,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -73,12 +75,25 @@ export default function SettingsScreen() {
     );
   };
 
+  const handlePrivacyPolicy = () => {
+    Linking.openURL("https://google.com").catch(() => {
+      Alert.alert("Error", "Could not open privacy policy link.");
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("@/assets/images/synkit-color-logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
         <Text style={styles.title}>Settings</Text>
 
         {isEditingName ? (
@@ -147,6 +162,20 @@ export default function SettingsScreen() {
             workout and mood data.
           </Text>
         </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Legal</Text>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Privacy Policy"
+              onPress={handlePrivacyPolicy}
+              variant="secondary"
+            />
+          </View>
+          <Text style={styles.description}>
+            View our privacy policy and terms of service.
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -164,6 +193,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 40,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  logo: {
+    width: 120,
+    height: 40,
   },
   title: {
     fontSize: 24,

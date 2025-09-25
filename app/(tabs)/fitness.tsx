@@ -122,7 +122,39 @@ export default function Fitness() {
             </Card>
           </View>
           <View style={styles.section}>
-            <Subheading>My Workouts</Subheading>
+            <Subheading>Workout plan</Subheading>
+            <Card
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 12,
+                }}
+              >
+                <Subheading style={{ marginBottom: 0, flexWrap: "wrap" }}>
+                  {logging.getCurrentPlan()?.name}
+                </Subheading>
+                <Paragraph>Workout plan</Paragraph>
+              </View>
+
+              <Button
+                title="Change"
+                variant="secondary"
+                onPress={() => SheetManager.show("change-plan-sheet")}
+              />
+            </Card>
+          </View>
+          <View style={styles.section}>
+            <Subheading>Workout history</Subheading>
             <Card
               style={{
                 display: "flex",
@@ -153,36 +185,6 @@ export default function Fitness() {
                 title="View All"
                 variant="secondary"
                 onPress={() => router.push("/workout-history")}
-              />
-            </Card>
-            <Card
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginTop: 10,
-              }}
-            >
-              <View
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  flex: 1,
-                  marginRight: 12,
-                }}
-              >
-                <Subheading style={{ marginBottom: 0, flexWrap: "wrap" }}>
-                  {logging.getCurrentPlan()?.name}
-                </Subheading>
-                <Paragraph>Workout plan</Paragraph>
-              </View>
-
-              <Button
-                title="Change"
-                variant="secondary"
-                onPress={() => SheetManager.show("change-plan-sheet")}
               />
             </Card>
           </View>

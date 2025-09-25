@@ -93,6 +93,7 @@ export interface SettingsActions {
     newPhase: PhaseType | undefined
   ) => Promise<boolean>;
   getWorkoutLevelName: (plan: WorkoutPlanType, level: WorkoutLevel) => string;
+  getTodaysRecommendedWorkout: () => Workout | undefined;
 }
 
 export const useLogging = create<
@@ -547,6 +548,79 @@ export const useLogging = create<
           return plans[level]?.name || level;
         }
         return level;
+      },
+      getTodaysRecommendedWorkout: () => {
+        const plan = get().getCurrentPlan();
+        if (!plan) return undefined;
+
+        const phase = get().calculateCurrentPhase();
+        if (!phase) return undefined;
+
+        const allWorkouts = plan.phases[phase]?.workouts;
+        if (!allWorkouts || allWorkouts.length === 0) return undefined;
+
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        // Get workouts completed in the last 7 days, but exclude today
+        // We want to allow today's completed workouts to be recommended again tomorrow
+        const recentCompletions = get()
+          .getWorkoutHistory(7)
+          .filter((completion) => {
+            const completionDate = new Date(completion.completedAt);
+            const completionDateString = dateToString(completionDate);
+            const todayString = dateToString(today);
+            return completionDateString !== todayString;
+          });
+
+        const recentWorkoutIds = new Set(
+          recentCompletions.map((completion) => completion.workoutId)
+        );
+
+        // Filter out recently completed workouts (excluding today)
+        const availableWorkouts = allWorkouts.filter(
+          (workout) => !recentWorkoutIds.has(workout.id)
+        );
+
+        // If we have available workouts, return the first one
+        if (availableWorkouts.length > 0) {
+          return availableWorkouts[0];
+        }
+
+        // If all workouts have been done recently, find the least recently completed one
+        if (recentCompletions.length > 0) {
+          const workoutCompletionMap = new Map();
+
+          // Build a map of workout ID to most recent completion time
+          recentCompletions.forEach((completion) => {
+            const existingTime = workoutCompletionMap.get(completion.workoutId);
+            const completionTime = new Date(completion.completedAt).getTime();
+
+            if (!existingTime || completionTime > existingTime) {
+              workoutCompletionMap.set(completion.workoutId, completionTime);
+            }
+          });
+
+          // Find the workout with the oldest completion time
+          let oldestWorkout = null;
+          let oldestTime = Infinity;
+
+          allWorkouts.forEach((workout) => {
+            const completionTime = workoutCompletionMap.get(workout.id);
+            if (completionTime && completionTime < oldestTime) {
+              oldestTime = completionTime;
+              oldestWorkout = workout;
+            }
+          });
+
+          if (oldestWorkout) {
+            return oldestWorkout;
+          }
+        }
+
+        // Fallback to first workout if no completion history
+        return allWorkouts[0];
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

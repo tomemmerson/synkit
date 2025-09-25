@@ -22,9 +22,9 @@ import { getWorkoutImage, workoutLibrary } from "@/data/workouts";
 export default function Fitness() {
   const logging = useLogging();
 
-  const workouts = logging.getCurrentWorkouts(true);
+  const todaysRecommendedWorkout = logging.getTodaysRecommendedWorkout();
 
-  if (!workouts || workouts.length === 0) {
+  if (!todaysRecommendedWorkout) {
     return (
       <View>
         <Text>No workouts available</Text>
@@ -34,14 +34,17 @@ export default function Fitness() {
 
   const completedToday = logging.getWorkoutCompletions(new Date());
 
-  let todaysWorkout = workouts[0];
+  let todaysWorkout = todaysRecommendedWorkout;
   let workoutComplete = false;
 
+  // If any workout was completed today, show that as today's workout
   if (completedToday.length > 0) {
-    const t = workoutLibrary[completedToday[0].workoutId];
-    if (t) {
+    const mostRecentCompletion = completedToday[completedToday.length - 1]; // Get the most recent completion
+    const completedWorkoutFromLibrary =
+      workoutLibrary[mostRecentCompletion.workoutId];
+    if (completedWorkoutFromLibrary) {
+      todaysWorkout = completedWorkoutFromLibrary;
       workoutComplete = true;
-      todaysWorkout = t;
     }
   }
 
@@ -158,7 +161,7 @@ export default function Fitness() {
               const allWorkouts = logging.getCurrentWorkouts(false); // Get all workouts including completed
               const otherWorkouts =
                 allWorkouts?.filter(
-                  (workout) => workout.id !== todaysWorkout.id
+                  (workout) => workout.id !== todaysWorkout.id // Use todaysWorkout instead of todaysRecommendedWorkout
                 ) || [];
 
               if (otherWorkouts.length === 0) {

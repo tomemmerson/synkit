@@ -82,6 +82,7 @@ export interface SettingsActions {
   isWorkoutComplete: (workout: Workout, days?: number) => boolean;
   clearWorkoutHistory: () => void;
   clearPeriodLogs: () => void;
+  resetAllData: () => void;
   getNextWorkoutLevel: (
     currentPlan: WorkoutPlanType,
     currentLevel: WorkoutLevel
@@ -627,6 +628,16 @@ export const useLogging = create<
       },
       setOnboardingComplete: (complete: boolean) => {
         set({ onboardingComplete: complete });
+      },
+      resetAllData: () => {
+        set({
+          days: {},
+          currentWorkoutPlan: undefined,
+          currentWorkoutLevel: undefined,
+          name: "",
+          initialPeriodDate: undefined,
+          onboardingComplete: false,
+        });
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

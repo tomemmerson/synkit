@@ -11,6 +11,7 @@ import {
   Linking,
   Image,
 } from "react-native";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
@@ -33,42 +34,32 @@ export default function SettingsScreen() {
     setIsEditingName(false);
   };
 
-  const handleClearWorkoutHistory = () => {
+  const handleRemoveAllData = () => {
     Alert.alert(
-      "Clear Workout History",
-      "Are you sure you want to clear all workout history? This action cannot be undone.",
+      "Remove All Data",
+      "Are you sure you want to remove all data? This will clear your workout history, period logs, and reset the app to its initial state. This action cannot be undone.",
       [
         {
           text: "Cancel",
           style: "cancel",
         },
         {
-          text: "Clear",
+          text: "Remove All",
           style: "destructive",
           onPress: () => {
-            logging.clearWorkoutHistory();
-            Alert.alert("Success", "Workout history has been cleared.");
-          },
-        },
-      ]
-    );
-  };
-
-  const handleClearPeriodLogs = () => {
-    Alert.alert(
-      "Clear Period Logs",
-      "Are you sure you want to clear all period data? This action cannot be undone.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Clear",
-          style: "destructive",
-          onPress: () => {
-            logging.clearPeriodLogs();
-            Alert.alert("Success", "Period logs have been cleared.");
+            logging.resetAllData();
+            Alert.alert(
+              "Success",
+              "All data has been removed. The app will restart.",
+              [
+                {
+                  text: "OK",
+                  onPress: () => {
+                    router.replace("/onboarding/welcome");
+                  },
+                },
+              ]
+            );
           },
         },
       ]
@@ -136,32 +127,18 @@ export default function SettingsScreen() {
         )}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Workout Data</Text>
+          <Text style={styles.sectionTitle}>App Data</Text>
           <View style={styles.buttonContainer}>
             <Button
-              title="Clear Workout History"
-              onPress={handleClearWorkoutHistory}
+              title="Remove All Data"
+              onPress={handleRemoveAllData}
               variant="secondary"
             />
           </View>
           <Text style={styles.description}>
-            This will remove all completed workout records while keeping your
-            period and mood data.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Period Data</Text>
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Clear Period Logs"
-              onPress={handleClearPeriodLogs}
-              variant="secondary"
-            />
-          </View>
-          <Text style={styles.description}>
-            This will remove all period flow and symptom data while keeping your
-            workout and mood data.
+            This will remove all your data including workout history, period
+            logs, and reset the app to its initial state. You'll need to
+            complete onboarding again.
           </Text>
         </View>
 

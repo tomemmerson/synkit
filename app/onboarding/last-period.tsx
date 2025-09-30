@@ -27,12 +27,12 @@ export default function LastPeriodScreen() {
 
   const handleNext = () => {
     // Save the last period date and navigate
-    // You might want to parse and validate the date here
     if (!lastPeriodDate) {
       return;
     }
 
     logging.setInitialPeriodDate(new Date(lastPeriodDate));
+    logging.setOnboardingComplete(true);
     router.push("/(tabs)");
   };
 

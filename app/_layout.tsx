@@ -13,6 +13,7 @@ import { SheetProvider } from "react-native-actions-sheet";
 import { MenuProvider } from "react-native-popup-menu";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useLogging } from "@/data/logging";
 import * as Notifications from "expo-notifications";
 
 const trackAutomaticEvents = false; //disable legacy mobile autotrack
@@ -38,6 +39,7 @@ Notifications.setNotificationHandler({
 
 export default function RootLayout() {
   // const colorScheme = useColorScheme();
+  const { onboardingComplete } = useLogging();
 
   useEffect(() => {
     SplashScreen.hideAsync();
@@ -47,12 +49,6 @@ export default function RootLayout() {
     <ThemeProvider value={DefaultTheme}>
       <MenuProvider>
         <SheetProvider context="global">
-          {/* {false && (
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="(onboarding)" />
-              </Stack>
-            )} */}
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="onboarding" />

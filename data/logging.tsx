@@ -94,6 +94,7 @@ export interface SettingsActions {
   ) => Promise<boolean>;
   getWorkoutLevelName: (plan: WorkoutPlanType, level: WorkoutLevel) => string;
   getTodaysRecommendedWorkout: () => Workout | undefined;
+  setOnboardingComplete: (complete: boolean) => void;
 }
 
 export const useLogging = create<
@@ -103,6 +104,7 @@ export const useLogging = create<
     currentWorkoutLevel?: WorkoutLevel;
     name: string;
     initialPeriodDate?: string;
+    onboardingComplete: boolean;
   } & SettingsActions
 >()(
   persist(
@@ -112,6 +114,7 @@ export const useLogging = create<
       currentWorkoutLevel: undefined,
       name: "",
       initialPeriodDate: undefined,
+      onboardingComplete: false,
       getCurrentPlan: () => {
         let plan = get().currentWorkoutPlan;
         let level = get().currentWorkoutLevel;
@@ -621,6 +624,9 @@ export const useLogging = create<
 
         // Fallback to first workout if no completion history
         return allWorkouts[0];
+      },
+      setOnboardingComplete: (complete: boolean) => {
+        set({ onboardingComplete: complete });
       },
     }),
     { name: "settings", storage: createJSONStorage(() => AsyncStorage) }

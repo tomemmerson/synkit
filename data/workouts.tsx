@@ -71,7 +71,7 @@ export const workoutLibrary: Record<string, Workout> = {
       },
     ],
     difficulty: "Low",
-    estimatedDuration: "30 mins",
+    estimatedDuration: "20 - 30 mins",
   },
 
   // Run/Walk workouts
@@ -86,7 +86,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
-    estimatedDuration: "20 mins",
+    estimatedDuration: "20 - 30 mins",
   },
 
   follicularRunWalk: {
@@ -100,6 +100,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   ovulationRunWalk: {
@@ -113,6 +114,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   intermediateRunWalk1: {
@@ -136,6 +138,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   intermediateRunWalk2: {
@@ -159,6 +162,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/fast-walking.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   // Stretch workouts
@@ -203,6 +207,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/shoulder.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   // Strength workouts
@@ -242,6 +247,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/bird-dog.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   intermediateStrength: {
@@ -280,6 +286,7 @@ export const workoutLibrary: Record<string, Workout> = {
         icon: require("@/assets/images/movements/deadlift.png"),
       },
     ],
+    estimatedDuration: "20 - 30 mins",
   },
 
   // Advanced workouts
@@ -790,7 +797,7 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "DB deadlifts",
         description: "15 reps each side / 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/deadlift.png"),
       },
       {
         name: "DB Glute Bridges",
@@ -1284,27 +1291,27 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Goblet Squat",
         description: "10 reps x 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/goblet-squats.png"),
       },
       {
         name: "Chest press machine",
         description: "10 reps x 3sets",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-chest-press-machine.png"),
       },
       {
         name: "Bent over row machine",
         description: "10 reps x 3sets (Alternate: Single arm bent over row)",
-        icon: "",
+        icon: require("@/assets/images/movements/bent-over-rows.png"),
       },
       {
         name: "Shoulder press machine",
         description: "10 reps x 3sets (Alternate: DB shoulder press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-shoulder-press.png"),
       },
       {
         name: "Deadbugs",
         description: "10 reps x 3sets",
-        icon: "",
+        icon: require("@/assets/images/movements/dead-bugs.png"),
       },
     ],
     estimatedDuration: "40 mins",
@@ -1318,32 +1325,32 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Leg press",
         description: "10 reps x 3sets (Alternate: Goblet Squat)",
-        icon: "",
+        icon: require("@/assets/images/movements/leg-press.png"),
       },
       {
         name: "DB deadlift",
         description: "10 reps x 3sets (Alternate: Hamstring Machine)",
-        icon: "",
+        icon: require("@/assets/images/movements/deadlift.png"),
       },
       {
         name: "Lunges",
         description: "12 each side x 3sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bw-lunges.png"),
       },
       {
         name: "Glute Bridge",
         description: "15 reps x 3sets",
-        icon: "",
+        icon: require("@/assets/images/movements/glute-bridges.png"),
       },
       {
         name: "Clamshells",
         description: "12 each side x 3sets",
-        icon: "",
+        icon: require("@/assets/images/movements/clamshells.png"),
       },
       {
         name: "Plank",
         description: "10 x 3sets (For beginners, knees should be on the floor)",
-        icon: "",
+        icon: require("@/assets/images/movements/plank.png"),
       },
     ],
     estimatedDuration: "35 mins",
@@ -1357,32 +1364,32 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Shoulder press machine",
         description: "10 reps x 3 sets (Alternate: DB shoulder press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-shoulder-press.png"),
       },
       {
         name: "Single-arm bent over rows",
         description: "10 reps x 3 sets with DB",
-        icon: "",
+        icon: require("@/assets/images/movements/bent-over-rows.png"),
       },
       {
         name: "Seated Chest Press Machine",
         description: "10 reps x 3 sets (Alternate: DB chest press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-chest-press-machine.png"),
       },
       {
         name: "Lateral raises",
         description: "10 reps x 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/lateral-raises.png"),
       },
       {
         name: "DB Tricep Kickbacks",
         description: "10 reps x 2 sets (Alternate: Chair dips)",
-        icon: "",
+        icon: require("@/assets/images/movements/tricep-kickbacks.png"),
       },
       {
         name: "Shoulder Taps",
         description: "12 reps x 2 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/shoulder-taps.png"),
       },
     ],
     estimatedDuration: "35 mins",
@@ -1396,33 +1403,33 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Goblet OR BW Squats with heels elevated",
         description: "10x3 sets (comfortable weights)",
-        icon: "",
+        icon: require("@/assets/images/movements/goblet-squats.png"),
       },
       {
         name: "Step ups",
         description: "12 each side x 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/step-ups.png"),
       },
       {
         name: "Seated Chest Press Machine",
         description: "10 x 3sets (Alternate: DB chest press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-chest-press-machine.png"),
       },
       {
         name: "Bent Over Row Machine",
         description: "10 x 3sets (Alternate: Single arm bent over row)",
-        icon: "",
+        icon: require("@/assets/images/movements/bent-over-rows.png"),
       },
       {
         name: "Seated Shoulder Press",
         description: "10 x 3sets (Alternate: DB shoulder press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-shoulder-press.png"),
       },
       {
         name: "Plank",
         description:
           "30sec x 2 sets (For beginners, knees should be on the floor)",
-        icon: "",
+        icon: require("@/assets/images/movements/plank.png"),
       },
     ],
     estimatedDuration: "40 mins",
@@ -1436,32 +1443,32 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Leg press",
         description: "10 x 3sets (Alternate: Goblet Squat)",
-        icon: "",
+        icon: require("@/assets/images/movements/leg-press.png"),
       },
       {
         name: "DB deadlift",
         description: "10 x 3sets (Alternate: Hamstring Machine)",
-        icon: "",
+        icon: require("@/assets/images/movements/deadlift.png"),
       },
       {
         name: "Static Lunges",
         description: "10 each side x 2sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bw-lunges.png"),
       },
       {
         name: "Glute Bridge",
         description: "10 x 3sets",
-        icon: "",
+        icon: require("@/assets/images/movements/glute-bridges.png"),
       },
       {
         name: "Clamshells",
         description: "12 each side x 2sets",
-        icon: "",
+        icon: require("@/assets/images/movements/clamshells.png"),
       },
       {
         name: "Bird Dog",
         description: "10 each side x 2sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bird-dog.png"),
       },
     ],
     estimatedDuration: "30 mins",
@@ -1475,32 +1482,32 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "Shoulder press machine",
         description: "10 x 3 sets (Alternate: DB shoulder press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-shoulder-press.png"),
       },
       {
         name: "Single-arm bent over rows",
         description: "10 x 3 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bent-over-rows.png"),
       },
       {
         name: "Seated Chest Press Machine",
         description: "10 x 3 sets (Alternate: DB chest press)",
-        icon: "",
+        icon: require("@/assets/images/movements/seated-chest-press-machine.png"),
       },
       {
         name: "Lateral raises",
         description: "12 x 2 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/lateral-raises.png"),
       },
       {
         name: "Chair/bench dips",
         description: "10 x 2 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/bench-dips.png"),
       },
       {
         name: "Shoulder Taps",
         description: "12 x 2 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/shoulder-taps.png"),
       },
     ],
     estimatedDuration: "35 mins",
@@ -1535,12 +1542,12 @@ export const workoutLibrary: Record<string, Workout> = {
       {
         name: "T-Spine Rotation",
         description: "6 reps each side x 2 sets",
-        icon: "",
+        icon: require("@/assets/images/movements/t-spine-rotations.png"),
       },
       {
         name: "Arm Rotations and Shoulder Rolls",
         description: "30sec",
-        icon: "",
+        icon: require("@/assets/images/movements/arm-rotations.png"),
       },
     ],
   },
